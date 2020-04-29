@@ -18,7 +18,7 @@ public:
   void stop();
 
 signals:
-  void streamEstablished();
+  void streamEstablished(bool on);
   void timeoutError();
   void connectionError(QString err);
 

@@ -26,6 +26,10 @@ add_executable(pientertain main.cpp
     huestream.hh
     lightpacket.cpp
     lightpacket.hh
+    videosource.cpp
+    videosource.hh
+    videosourceimage.cpp
+    videosourceimage.hh
 )
 
 target_link_libraries(pientertain Qt5::Network Qt5::Gui Qt5::Core )

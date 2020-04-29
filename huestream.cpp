@@ -10,6 +10,7 @@ HueStream::~HueStream() {
 }
 
 void HueStream::stop() {
+  emit streamEstablished(false);
   if (m_dtls) {
     m_dtls->shutdown(m_clientSocket);
   }
@@ -84,7 +85,7 @@ void HueStream::onDataAvailable()
   }
   if (m_dtls->isConnectionEncrypted()) {
     qDebug() << "is encrypted";
-    emit streamEstablished();
+    emit streamEstablished(true);
   }
 }
 

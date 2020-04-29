@@ -197,7 +197,6 @@ void HueAuthentication::onRequestFinished()
         qDebug() << doc.toJson(QJsonDocument::Compact);
         if (m_currentState == EnableStreaming) {
           m_currentState = DisableStreaming;
-          QTimer::singleShot(5000, this, &HueAuthentication::onAuthenticationStateChange);
           exit = false;
           emit streamingActive(true);
         } else {
