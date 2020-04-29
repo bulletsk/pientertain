@@ -43,7 +43,8 @@ public:
   QVector<QPoint> corners() const;
   void setCorners( const QVector<QPoint> &corners);
 
-  virtual QSize imageSize();
+  virtual QSize imageSize() const;
+  QImage currentImage() const;
 
   void stop();
 

@@ -3,6 +3,7 @@
 #include "huestream.hh"
 #include "lightpacket.hh"
 #include "videosource.hh"
+#include "restserver.hh"
 
 #include <QCoreApplication>
 
@@ -17,25 +18,44 @@ public:
     connect(&m_stream, &HueStream::streamEstablished, this, &StreamClient::onStreamEstablished);
     connect(&m_stream, &HueStream::connectionError, this, &StreamClient::onConnectionError);
 
+    connect(&m_server, &RESTServer::requestStart, this, &StreamClient::startStreaming);
+    connect(&m_server, &RESTServer::requestStop, this, &StreamClient::stopStreaming);
+    connect(&m_server, &RESTServer::requestShutdown, this, &StreamClient::shutDown);
+
+    connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);
+
     m_frameNumber = 0;
 
     m_videoSource = nullptr;
+
+
+
+  }
+
+  void start() {
+    startStreaming();
+  }
+
+  void startServer() {
+    m_server.startServer();
   }
 
   ~StreamClient()
   {}
 
-  void start() {
+public slots:
+  void startStreaming() {
     m_auth.startAuthentication();
   }
-
-
-public slots:
 
   void stopStreaming() {
     m_timer.stop();
     m_stream.stop();
     m_auth.stopStreaming();
+  }
+
+  void shutDown() {
+    QCoreApplication::exit(0);
   }
 
   void onStreamingActive(bool on)
@@ -58,8 +78,6 @@ public slots:
     //m_stream
 
     if (on) {
-      QTimer::singleShot(50000, this, &StreamClient::stopStreaming);
-      connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);
       m_timer.start(10);
 
       if (m_videoSource == nullptr) {
@@ -81,6 +99,7 @@ public slots:
 
   void onConnectionError(QString err) {
     qDebug() << "received error:" << err;
+    // todo just set status
     QCoreApplication::exit(0);
   }
 
@@ -198,6 +217,8 @@ public slots:
   int m_frameNumber;
   VideoSource *m_videoSource;
 
+  RESTServer m_server;
+
   LightPacket m_currentPacket;
 };
 
@@ -216,7 +237,8 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType< QVector<QColor> >();
 
   StreamClient client;
-  client.start();
+//  client.start();
+  client.startServer();
 
   return app.exec();
 }

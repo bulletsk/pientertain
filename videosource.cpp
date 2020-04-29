@@ -46,9 +46,14 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
   m_corners = corners;
 }
 
-QSize VideoSource::imageSize() {
+QSize VideoSource::imageSize() const {
   return m_currentImage.size();
 }
+
+QImage VideoSource::currentImage() const {
+  return m_currentImage;
+}
+
 
 void VideoSource::run() {
 
