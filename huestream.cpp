@@ -6,7 +6,9 @@
 #include <QSslPreSharedKeyAuthenticator>
 
 HueStream::~HueStream() {
+  blockSignals(true);
   stop();
+  blockSignals(false);
 }
 
 void HueStream::stop() {
@@ -21,7 +23,8 @@ void HueStream::stop() {
   m_clientSocket = nullptr;
 }
 
-HueStream::HueStream( QObject *parent) : QObject(parent)
+HueStream::HueStream( QObject *parent) : QObject(parent), m_dtls(nullptr), m_clientSocket(nullptr)
+
 
 {
 }

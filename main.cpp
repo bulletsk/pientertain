@@ -18,6 +18,7 @@ public:
     m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
     connect(m_videoSource, &VideoSource::newColors, this, &StreamClient::onNewColors, Qt::QueuedConnection);
     connect(m_videoSource, &VideoSource::statusChanged, &m_server, &RESTServer::onVideoStatus);
+    connect(m_videoSource, &VideoSource::latestImage, &m_server, &RESTServer::onVideoImage);
 
     connect(&m_auth, &HueAuthentication::streamingActive, this, &StreamClient::onStreamingActive);
     connect(&m_auth, &HueAuthentication::statusChanged, &m_server, &RESTServer::onBridgeStatus);
@@ -27,6 +28,7 @@ public:
     connect(&m_server, &RESTServer::requestStart, this, &StreamClient::startStreaming);
     connect(&m_server, &RESTServer::requestStop, this, &StreamClient::stopStreaming);
     connect(&m_server, &RESTServer::requestShutdown, this, &StreamClient::shutDown);
+    connect(&m_server, &RESTServer::requestImage, m_videoSource, &VideoSource::onRequestImage);
     connect(&m_server, &RESTServer::cornersChanged, m_videoSource, &VideoSource::setCorners);
 
     connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);

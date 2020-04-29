@@ -7,6 +7,9 @@ VideoSourceImage::VideoSourceImage(QString sourceIdentifier, QObject *parent)
 
 }
 
+VideoSourceImage::~VideoSourceImage() {
+}
+
 void VideoSourceImage::nextImage()
 {
 

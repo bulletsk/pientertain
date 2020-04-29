@@ -8,7 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-
+#include <QSettings>
 
 RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(8999)
 {
@@ -17,14 +17,49 @@ RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QT
   m_streamStatus = "ok";
   m_videoStatus = "ok";
 
+  m_corners.append(QPoint(0,0));
+
+  readSettings();
 
 }
 
 RESTServer::~RESTServer()
 {
+  writeSettings();
   stopServer();
   delete m_serverSocket;
 }
+
+
+void RESTServer::readSettings()
+{
+  m_corners.clear();
+  QSettings settings(QSettings::UserScope);
+  settings.beginGroup("servercorners");
+  for (int i=1;i<=4;i++) {
+    QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
+    if ( p.x() < 0) {
+      m_corners.clear();
+      break;
+    }
+    m_corners.append(p);
+  }
+  settings.endGroup();
+}
+
+void RESTServer::writeSettings()
+{
+  if (m_corners.size() != 4) {
+    return;
+  }
+  QSettings settings(QSettings::UserScope);
+  settings.beginGroup("servercorners");
+  for (int i=1;i<=4;i++) {
+    settings.setValue("point"+QString::number(i), m_corners[i-1]);
+  }
+  settings.endGroup();
+}
+
 
 
 
@@ -103,6 +138,14 @@ void RESTServer::handleRequest()
 }
 
 
+void RESTServer::onVideoImage(const QImage &image)
+{
+  m_latestImageJPG.clear();
+  QBuffer qio(&m_latestImageJPG);
+  image.save(&qio, "jpg", 10);
+}
+
+
 void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
 {
   QString mimetype = "application/json";
@@ -110,17 +153,9 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
     QString data = "[]";
     send(socket, data.toLatin1(), mimetype);
   } else if (resource == "/corners") {
-    /*
-     * todo get from videosource
-     *
-     * /
-     */
-    QVector<QPoint> corners; // = videosource->corners
-    corners.append(QPoint(0,0));
-    corners.append(QPoint(123,234));
 
     QJsonArray arr;
-    for (QPoint p : corners) {
+    for (QPoint p : m_corners) {
       QJsonObject jp;
       jp["x"] = p.x();
       jp["y"] = p.y();
@@ -130,19 +165,16 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
     QByteArray data = doc.toJson(QJsonDocument::Compact);
     send(socket, data, mimetype);
   } else if (resource == "/image") {
-    /*
-     * todo get from videosource
-     *
-     * /
-     */
+    emit requestImage();
     mimetype = "image/jpeg";
-    QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
-    QImage img; //= videosource->image
-    img.load(imgName);
-    QByteArray imagedata;
-    QBuffer qio(&imagedata);
-    img.save(&qio, "jpg", 10);
-    send(socket, imagedata, mimetype);
+    if (m_latestImageJPG.isEmpty()) {
+      QImage img(1920,1080, QImage::Format_RGB32);
+      img.fill(0);
+      QByteArray imagedata;
+      QBuffer qio(&imagedata);
+      img.save(&qio, "jpg", 10);
+    }
+    send(socket, m_latestImageJPG, mimetype);
   } else if (resource == "/status") {
     /*
      * todo get from videosource
@@ -195,12 +227,15 @@ void RESTServer::handlePut(QTcpSocket *socket, const QString &resource, const QB
       p.setY( o["y"].toInt() );
       points.append(p);
     }
-    QString mimetype = "application/json";
+    QString mimetype = "application/json;charset=utf-8";
     QJsonObject obj;
     QJsonDocument docR( obj );
     QByteArray reply = docR.toJson(QJsonDocument::Compact);
     send(socket, reply, mimetype);
     emit cornersChanged( points );
+    if (points.length()==4) {
+      m_corners = points;
+    }
   } else {
     sendError(socket);
   }
@@ -212,7 +247,9 @@ void RESTServer::send(QTcpSocket *socket, const QByteArray &data, QString &mimet
       "HTTP/1.1 200 OK\r\n"
       "Server: PiEntertain\r\n"
       "Content-Length: " + QString::number(data.length()) + "\r\n"
-      "Connection: close"
+      "Connection: close\r\n"
+      "Cache-Control: no-cache\r\n"
+      "Vary: Accept-Encoding\r\n"
       "Content-Type: " + mimetype + "\r\n\r\n";
   QByteArray response = header.toLatin1();
   response.append(data);

@@ -12,12 +12,16 @@ public:
   void startServer();
   void stopServer();
 
+  void readSettings();
+  void writeSettings();
+
 
 signals:
 
   void requestStart();
   void requestStop();
   void requestShutdown();
+  void requestImage();
   void cornersChanged( QVector<QPoint> );
 
 public slots:
@@ -25,6 +29,7 @@ public slots:
   void onBridgeStatus(QString status, bool err);
   void onStreamStatus(QString status, bool err);
   void onVideoStatus(QString status, bool err);
+  void onVideoImage(const QImage &image);
 
 protected slots:
   void onNewConnection();
@@ -45,6 +50,10 @@ private:
   QString m_bridgeStatus;
   QString m_streamStatus;
   QString m_videoStatus;
+
+  QByteArray m_latestImageJPG;
+
+  QVector<QPoint> m_corners;
 
 
 };

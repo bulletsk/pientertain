@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QImage>
+#include <QMutex>
 
 class VideoSource : public QThread
 {
@@ -54,6 +55,10 @@ public:
 signals:
   void newColors( QVector<QColor> colorVector );
   void statusChanged(QString status, bool err);
+  void latestImage( const QImage &image );
+
+public slots:
+  void onRequestImage();
 
 protected:
   void run() override;
@@ -66,9 +71,12 @@ protected:
   QVector<QColor> m_colors;
   QVector<QPoint> m_corners;
   QImage m_currentImage;
+  QImage m_latestImage;
   QString m_identifier;
 
   bool m_requestExit;
+
+  QMutex m_imageLock;
 
 };
 

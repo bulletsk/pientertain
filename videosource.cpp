@@ -21,9 +21,11 @@ VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType 
 VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false)
 {
 
+  readSettings();
 }
 
 VideoSource::~VideoSource() {
+  writeSettings();
   if (isRunning()) {
     stop();
   }
@@ -47,11 +49,11 @@ void VideoSource::readSettings()
 
 void VideoSource::writeSettings()
 {
-  QSettings settings(QSettings::UserScope);
-  settings.beginGroup("auth");
   if (m_corners.size() != 4) {
     return;
   }
+  QSettings settings(QSettings::UserScope);
+  settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     settings.setValue("point"+QString::number(i), m_corners[i-1]);
   }
@@ -85,14 +87,21 @@ QImage VideoSource::currentImage() const {
   return m_currentImage;
 }
 
+void VideoSource::onRequestImage() {
+  m_imageLock.lock();
+  m_latestImage = m_currentImage;
+  m_imageLock.unlock();
+  emit latestImage(m_latestImage);
+}
 
 void VideoSource::run() {
 
   m_colors.resize((int)CornerLast);
 
   while (!m_requestExit) {
-
+    m_imageLock.lock();
     nextImage();
+    m_imageLock.unlock();
     calculateColors();
     emit newColors(m_colors);
 
