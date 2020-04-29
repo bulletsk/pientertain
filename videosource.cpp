@@ -1,11 +1,14 @@
 #include "videosource.hh"
 #include "videosourceimage.hh"
+#include "videosourceraspberrycam.hh"
 #include <QDebug>
 
 VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType type) {
   switch (type) {
   case Image:
     return new VideoSourceImage(identifier, nullptr);
+  case Camera:
+    return new VideoSourceRaspberryCam(identifier, nullptr);
   default:
     break;
   }
@@ -18,6 +21,13 @@ VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(pa
 {
 
 }
+
+VideoSource::~VideoSource() {
+  if (isRunning()) {
+    stop();
+  }
+}
+
 
 void VideoSource::stop()
 {

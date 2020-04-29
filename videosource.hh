@@ -36,6 +36,7 @@ public:
   };
 
   explicit VideoSource(QString sourceIdentifier="", QObject *parent = nullptr);
+  virtual ~VideoSource();
 
   static VideoSource *createVideoSource(QString identifier, VideoSourceType type);
 
