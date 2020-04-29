@@ -20,7 +20,7 @@ public:
 signals:
   void streamEstablished(bool on);
   void timeoutError();
-  void connectionError(QString err);
+  void statusChanged(QString status, bool err);
 
 protected slots:
   void onPskRequired(QSslPreSharedKeyAuthenticator *authenticator);

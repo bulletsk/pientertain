@@ -48,8 +48,12 @@ public:
 
   void stop();
 
+  void readSettings();
+  void writeSettings();
+
 signals:
   void newColors( QVector<QColor> colorVector );
+  void statusChanged(QString status, bool err);
 
 protected:
   void run() override;

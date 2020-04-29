@@ -12,16 +12,23 @@ public:
   void startServer();
   void stopServer();
 
+
 signals:
 
   void requestStart();
   void requestStop();
   void requestShutdown();
+  void cornersChanged( QVector<QPoint> );
+
+public slots:
+  // put status messages here
+  void onBridgeStatus(QString status, bool err);
+  void onStreamStatus(QString status, bool err);
+  void onVideoStatus(QString status, bool err);
 
 protected slots:
   void onNewConnection();
   void handleRequest();
-  // put status messages here
 
 protected:
   void handleGet(QTcpSocket *socket, const QString &resource);
@@ -34,6 +41,10 @@ private:
   QTcpServer *m_serverSocket;
 
   const int m_listenPort;
+
+  QString m_bridgeStatus;
+  QString m_streamStatus;
+  QString m_videoStatus;
 
 
 };

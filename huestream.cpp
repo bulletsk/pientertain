@@ -11,6 +11,7 @@ HueStream::~HueStream() {
 
 void HueStream::stop() {
   emit streamEstablished(false);
+  emit statusChanged("stopped", false);
   if (m_dtls) {
     m_dtls->shutdown(m_clientSocket);
   }
@@ -49,7 +50,7 @@ void HueStream::connectStream(QString username, QString clientkey) {
 
   if (!m_dtls->doHandshake(m_clientSocket)) {
     qDebug() << "error" << m_dtls->dtlsErrorString();
-    emit connectionError(m_dtls->dtlsErrorString());
+    emit statusChanged(m_dtls->dtlsErrorString(), true);
   }
 }
 
@@ -64,6 +65,7 @@ void HueStream::onHandshakeTimeout()
 {
   if (!m_dtls->handleTimeout(m_clientSocket)) {
       qDebug() << "socket timeout fail";
+      emit statusChanged("timeout", true);
       emit timeoutError();
   }
 }
@@ -86,6 +88,7 @@ void HueStream::onDataAvailable()
   if (m_dtls->isConnectionEncrypted()) {
     qDebug() << "is encrypted";
     emit streamEstablished(true);
+    emit statusChanged("active", false);
   }
 }
 

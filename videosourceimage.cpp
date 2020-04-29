@@ -16,6 +16,9 @@ void VideoSourceImage::nextImage()
     bool ok = m_currentImage.load(m_identifier);
     if (!ok) {
       qDebug() << "could not load image" << m_identifier;
+      emit statusChanged("could not load image " + m_identifier, true);
+    } else {
+      emit statusChanged("image loaded", false);
     }
 
   }

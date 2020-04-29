@@ -8,8 +8,8 @@ HueAuthentication::HueAuthentication() : QObject(), m_appName("pientertain#valha
 {
   readSettings();
 
-  m_username = "aSovHP9X3j7bzRD7Foxu90xBIEJHL0l99Sbtg6Q6";
-  m_clientkey = "B68FD5B0E4AD16334303AE8A0D6CD403";
+//  m_username = "aSovHP9X3j7bzRD7Foxu90xBIEJHL0l99Sbtg6Q6";
+//  m_clientkey = "B68FD5B0E4AD16334303AE8A0D6CD403";
 
   qDebug() << m_username;
 }
@@ -130,7 +130,7 @@ void HueAuthentication::onRequestFinished()
   if (error) {
     qDebug() << "error";
     qDebug() << m_response;
-    emit onConnectionError(m_response);
+    emit statusChanged(m_response, true);
     return;
   }
 
@@ -149,7 +149,9 @@ void HueAuthentication::onRequestFinished()
     for (QJsonValueRef ref : arr) {
       QJsonObject obj = ref.toObject();
       if (obj.contains("error")) {
-        qDebug() << obj["error"].toObject()["description"].toString();
+        QString err = obj["error"].toObject()["description"].toString();
+        qDebug() << err;
+        emit statusChanged(err, true);
         QTimer::singleShot(5000, this, &HueAuthentication::onAuthenticationStateChange);
         exit = false;
       } else if (obj.contains("success")) {
@@ -181,6 +183,8 @@ void HueAuthentication::onRequestFinished()
       exit = false;
       m_currentState = EnableStreaming;
       QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
+    } else {
+      emit statusChanged("no entertainment group", true);
     }
   }
     break;
@@ -199,9 +203,11 @@ void HueAuthentication::onRequestFinished()
           m_currentState = DisableStreaming;
           exit = false;
           emit streamingActive(true);
+          emit statusChanged("stream enabled", false);
         } else {
           // go to exit
           emit streamingActive(false);
+          emit statusChanged("stream disabled", false);
         }
       }
     }

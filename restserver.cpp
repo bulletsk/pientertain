@@ -13,6 +13,9 @@
 RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(8999)
 {
 
+  m_bridgeStatus = "ok";
+  m_streamStatus = "ok";
+  m_videoStatus = "ok";
 
 
 }
@@ -147,9 +150,9 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
      * /
      */
     QJsonObject obj;
-    obj["bridge"] = "okay"; // todo get from hueauth
-    obj["stream"] = "okay"; // todo get huestream
-    obj["video"] = "okay"; // todo get from videosource
+    obj["bridge"] = m_bridgeStatus;
+    obj["stream"] = m_streamStatus;
+    obj["video"] = m_videoStatus;
 
     QJsonDocument doc( obj );
     QByteArray data = doc.toJson(QJsonDocument::Compact);
@@ -179,7 +182,28 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
 
 void RESTServer::handlePut(QTcpSocket *socket, const QString &resource, const QByteArray &data)
 {
+  // todo validate input!!
 
+  if (resource == "/corners") {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QVector<QPoint> points;
+    QJsonArray arr = doc.array();
+    for (QJsonValueRef v : arr) {
+      QJsonObject o = v.toObject();
+      QPoint p;
+      p.setX( o["x"].toInt() );
+      p.setY( o["y"].toInt() );
+      points.append(p);
+    }
+    QString mimetype = "application/json";
+    QJsonObject obj;
+    QJsonDocument docR( obj );
+    QByteArray reply = docR.toJson(QJsonDocument::Compact);
+    send(socket, reply, mimetype);
+    emit cornersChanged( points );
+  } else {
+    sendError(socket);
+  }
 }
 
 void RESTServer::send(QTcpSocket *socket, const QByteArray &data, QString &mimetype)
@@ -199,4 +223,18 @@ void RESTServer::sendError(QTcpSocket *socket) {
 
 }
 
+
+void RESTServer::onBridgeStatus(QString status, bool err)
+{
+  m_bridgeStatus = (err ? "E " : "S ") + status;
+}
+
+void RESTServer::onStreamStatus(QString status, bool err)
+{
+  m_streamStatus = (err ? "E " : "S ") + status;
+}
+void RESTServer::onVideoStatus(QString status, bool err)
+{
+  m_videoStatus = (err ? "E " : "S ") + status;
+}
 

@@ -14,22 +14,24 @@ class StreamClient : public QObject {
 public:
   StreamClient()
   {
+    QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
+    m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
+    connect(m_videoSource, &VideoSource::newColors, this, &StreamClient::onNewColors, Qt::QueuedConnection);
+    connect(m_videoSource, &VideoSource::statusChanged, &m_server, &RESTServer::onVideoStatus);
+
     connect(&m_auth, &HueAuthentication::streamingActive, this, &StreamClient::onStreamingActive);
+    connect(&m_auth, &HueAuthentication::statusChanged, &m_server, &RESTServer::onBridgeStatus);
     connect(&m_stream, &HueStream::streamEstablished, this, &StreamClient::onStreamEstablished);
-    connect(&m_stream, &HueStream::connectionError, this, &StreamClient::onConnectionError);
+    connect(&m_stream, &HueStream::statusChanged, &m_server, &RESTServer::onStreamStatus);
 
     connect(&m_server, &RESTServer::requestStart, this, &StreamClient::startStreaming);
     connect(&m_server, &RESTServer::requestStop, this, &StreamClient::stopStreaming);
     connect(&m_server, &RESTServer::requestShutdown, this, &StreamClient::shutDown);
+    connect(&m_server, &RESTServer::cornersChanged, m_videoSource, &VideoSource::setCorners);
 
     connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);
 
     m_frameNumber = 0;
-
-    m_videoSource = nullptr;
-
-
-
   }
 
   void start() {
@@ -41,7 +43,9 @@ public:
   }
 
   ~StreamClient()
-  {}
+  {
+    delete m_videoSource;
+  }
 
 public slots:
   void startStreaming() {
@@ -79,28 +83,10 @@ public slots:
 
     if (on) {
       m_timer.start(10);
-
-      if (m_videoSource == nullptr) {
-        QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
-        m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
-        connect(m_videoSource, &VideoSource::newColors, this, &StreamClient::onNewColors, Qt::QueuedConnection);
-        m_videoSource->start();
-      }
-
+      m_videoSource->start();
     } else {
-      if (m_videoSource != nullptr) {
-        m_videoSource->stop();
-        delete m_videoSource;
-        m_videoSource = nullptr;
-      }
+      m_videoSource->stop();
     }
-
-  }
-
-  void onConnectionError(QString err) {
-    qDebug() << "received error:" << err;
-    // todo just set status
-    QCoreApplication::exit(0);
   }
 
   void onTimer() {
@@ -235,6 +221,7 @@ int main(int argc, char *argv[]) {
   QCoreApplication app(argc, argv);
 
   qRegisterMetaType< QVector<QColor> >();
+  qRegisterMetaType< QVector<QPoint> >();
 
   StreamClient client;
 //  client.start();

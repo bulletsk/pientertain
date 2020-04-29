@@ -2,6 +2,7 @@
 #include "videosourceimage.hh"
 #include "videosourceraspberrycam.hh"
 #include <QDebug>
+#include <QSettings>
 
 VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType type) {
   switch (type) {
@@ -28,6 +29,34 @@ VideoSource::~VideoSource() {
   }
 }
 
+void VideoSource::readSettings()
+{
+  m_corners.clear();
+  QSettings settings(QSettings::UserScope);
+  settings.beginGroup("corners");
+  for (int i=1;i<=4;i++) {
+    QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
+    if ( p.x() < 0) {
+      m_corners.clear();
+      break;
+    }
+    m_corners.append(p);
+  }
+  settings.endGroup();
+}
+
+void VideoSource::writeSettings()
+{
+  QSettings settings(QSettings::UserScope);
+  settings.beginGroup("auth");
+  if (m_corners.size() != 4) {
+    return;
+  }
+  for (int i=1;i<=4;i++) {
+    settings.setValue("point"+QString::number(i), m_corners[i-1]);
+  }
+  settings.endGroup();
+}
 
 void VideoSource::stop()
 {
@@ -42,7 +71,9 @@ QVector<QPoint> VideoSource::corners() const
 }
 void VideoSource::setCorners( const QVector<QPoint> &corners)
 {
-  Q_ASSERT(corners.size()==4);
+  if (corners.size()!=4) {
+    return;
+  }
   m_corners = corners;
 }
 

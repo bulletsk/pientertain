@@ -34,7 +34,7 @@ public:
 
 signals:
   void streamingActive(bool on);
-  void onConnectionError(QString err);
+  void statusChanged(QString err, bool isError);
 
 public slots:
   void onAuthenticationStateChange();
