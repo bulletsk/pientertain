@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HUEAUTHENTICATION_H_
+#define HUEAUTHENTICATION_H_
 
 #include <QObject>
 #include <QtNetwork>
@@ -63,3 +64,5 @@ private:
   QVector<LightGroup> m_groups;
 
 };
+
+#endif // HUEAUTHENTICATION_H_

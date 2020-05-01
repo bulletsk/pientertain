@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QJsonArray>
 
+LightGroup::LightGroup() : m_id(-1){}
+
 LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(id)
 {
   if (contains("lights")) {

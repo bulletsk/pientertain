@@ -15,7 +15,7 @@ public:
   StreamClient()
   {
     QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
-    m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
+    m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Camera );
     connect(m_videoSource, &VideoSource::newColors, this, &StreamClient::onNewColors, Qt::QueuedConnection);
     connect(m_videoSource, &VideoSource::statusChanged, &m_server, &RESTServer::onVideoStatus);
     connect(m_videoSource, &VideoSource::latestImage, &m_server, &RESTServer::onVideoImage);

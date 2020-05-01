@@ -2,6 +2,7 @@
 #define VIDEOSOURCERASPBERRYCAM_HH
 
 #include <videosource.hh>
+#include <raspicam/raspicaminterface_global.h>
 
 class VideoSourceRaspberryCam : public VideoSource
 {
@@ -21,7 +22,7 @@ protected:
 
   bool shutdownCamera();
 
-  void *m_camera;
+  CameraHandle m_camera;
 
 };
 

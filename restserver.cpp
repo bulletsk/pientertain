@@ -34,7 +34,7 @@ RESTServer::~RESTServer()
 void RESTServer::readSettings()
 {
   m_corners.clear();
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("servercorners");
   for (int i=1;i<=4;i++) {
     QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
@@ -52,7 +52,7 @@ void RESTServer::writeSettings()
   if (m_corners.size() != 4) {
     return;
   }
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("servercorners");
   for (int i=1;i<=4;i++) {
     settings.setValue("point"+QString::number(i), m_corners[i-1]);

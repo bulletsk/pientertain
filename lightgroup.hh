@@ -22,6 +22,7 @@ public:
     QVector3D pos;
   };
 
+  LightGroup();
   LightGroup(int id, const QJsonObject &obj);
 
   int id() const;

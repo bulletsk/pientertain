@@ -3,6 +3,7 @@
 #include "videosourceraspberrycam.hh"
 #include <QDebug>
 #include <QSettings>
+#include <QCoreApplication>
 
 VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType type) {
   switch (type) {
@@ -34,7 +35,7 @@ VideoSource::~VideoSource() {
 void VideoSource::readSettings()
 {
   m_corners.clear();
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
@@ -52,7 +53,7 @@ void VideoSource::writeSettings()
   if (m_corners.size() != 4) {
     return;
   }
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     settings.setValue("point"+QString::number(i), m_corners[i-1]);
@@ -129,8 +130,8 @@ void VideoSource::calculateColors()
     curCorners = m_corners;
   }
 
-  if (m_currentImage.format() != QImage::Format_RGB32) {
-    qDebug() << "format not rgb32";
+  if (m_currentImage.format() != QImage::Format_RGB888) {
+    qDebug() << "format not rgb888";
     return;
   }
 

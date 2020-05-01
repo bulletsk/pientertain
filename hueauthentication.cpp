@@ -1,6 +1,7 @@
 #include "hueauthentication.hh"
 
 #include <QSettings>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QJsonObject>
 
@@ -99,7 +100,7 @@ void HueAuthentication::onAuthenticationStateChange()
 
 void HueAuthentication::readSettings()
 {
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("auth");
   m_username = settings.value("user", "").toString();
   m_clientkey = settings.value("key", "").toString();
@@ -108,7 +109,7 @@ void HueAuthentication::readSettings()
 
 void HueAuthentication::writeSettings()
 {
-  QSettings settings(QSettings::UserScope);
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("auth");
   settings.setValue("user", m_username);
   settings.setValue("key", m_clientkey);
