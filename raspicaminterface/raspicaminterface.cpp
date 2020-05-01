@@ -64,3 +64,28 @@ void raspicam_set_saturation(CameraHandle handle, int s)
   raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
   cam->setSaturation(s);
 }
+
+void raspicam_set_contrast(CameraHandle, int c) {
+  raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
+  cam->setContrast(c);
+}
+
+// values 0 to 8
+void raspicam_set_whitebalance(CameraHandle, int r, int b) {
+  raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
+  cam->setAWB_RB(r,b);
+}
+
+// value 100 to 800
+void raspicam_set_ISO(CameraHandle, int iso) {
+  raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
+  cam->setISO(iso);
+}
+
+// value 0 to 33000
+void raspicam_set_shutterspeed(CameraHandle, int nanosecs)
+{
+  raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
+  cam->setShutterSpeed(nanosecs);
+}
+
