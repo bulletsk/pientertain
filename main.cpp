@@ -30,6 +30,8 @@ public:
     connect(&m_server, &RESTServer::requestShutdown, this, &StreamClient::shutDown);
     connect(&m_server, &RESTServer::requestImage, m_videoSource, &VideoSource::onRequestImage);
     connect(&m_server, &RESTServer::cornersChanged, m_videoSource, &VideoSource::setCorners);
+    connect(&m_server, &RESTServer::cameraSettingsChanged, m_videoSource, &VideoSource::setCameraSettings);
+    connect(m_videoSource, &VideoSource::cameraSettingsChanged, &m_server, &RESTServer::onCameraSettingsChanged);
 
     connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);
 

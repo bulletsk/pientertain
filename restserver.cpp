@@ -45,6 +45,10 @@ void RESTServer::readSettings()
     m_corners.append(p);
   }
   settings.endGroup();
+  QString json = settings.value("camsettings", "").toString();
+  QJsonDocument doc = QJsonDocument::fromJson( json.toLatin1() );
+  m_cameraSettings = doc.object();
+  emit cameraSettingsChanged(m_cameraSettings);
 }
 
 void RESTServer::writeSettings()
@@ -58,6 +62,11 @@ void RESTServer::writeSettings()
     settings.setValue("point"+QString::number(i), m_corners[i-1]);
   }
   settings.endGroup();
+  if (!m_cameraSettings.empty()) {
+    QJsonDocument doc(m_cameraSettings);
+    QString val = doc.toJson(QJsonDocument::Compact);
+    settings.setValue("camsettings", val);
+  }
 }
 
 
@@ -145,6 +154,11 @@ void RESTServer::onVideoImage(const QImage &image)
   image.save(&qio, "jpg", 10);
 }
 
+void RESTServer::onCameraSettingsChanged( QJsonObject json )
+{
+  m_cameraSettings = json;
+}
+
 
 void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
 {
@@ -176,16 +190,11 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
     }
     send(socket, m_latestImageJPG, mimetype);
   } else if (resource == "/status") {
-    /*
-     * todo get from videosource
-     *
-     * /
-     */
     QJsonObject obj;
     obj["bridge"] = m_bridgeStatus;
     obj["stream"] = m_streamStatus;
     obj["video"] = m_videoStatus;
-
+    obj["camerasettings"] = m_cameraSettings;
     QJsonDocument doc( obj );
     QByteArray data = doc.toJson(QJsonDocument::Compact);
     send(socket, data, mimetype);
@@ -236,6 +245,9 @@ void RESTServer::handlePut(QTcpSocket *socket, const QString &resource, const QB
     if (points.length()==4) {
       m_corners = points;
     }
+  } else if (resource == "/camsettings") {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    emit cameraSettingsChanged(doc.object());
   } else {
     sendError(socket);
   }

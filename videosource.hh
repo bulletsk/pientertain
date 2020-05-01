@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QImage>
 #include <QMutex>
+#include <QJsonObject>
 
 class VideoSource : public QThread
 {
@@ -42,7 +43,6 @@ public:
   static VideoSource *createVideoSource(QString identifier, VideoSourceType type);
 
   QVector<QPoint> corners() const;
-  void setCorners( const QVector<QPoint> &corners);
 
   virtual QSize imageSize() const;
   QImage currentImage() const;
@@ -56,9 +56,12 @@ signals:
   void newColors( QVector<QColor> colorVector );
   void statusChanged(QString status, bool err);
   void latestImage( const QImage &image );
+  void cameraSettingsChanged( QJsonObject jsonString );
 
 public slots:
   void onRequestImage();
+  void setCorners( const QVector<QPoint> &corners);
+  virtual void setCameraSettings (QJsonObject jsonString );
 
 protected:
   void run() override;

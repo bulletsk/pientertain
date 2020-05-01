@@ -80,6 +80,12 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
   m_corners = corners;
 }
 
+void VideoSource::setCameraSettings (QJsonObject )
+{
+  qDebug() << "settings not applied for this image source";
+}
+
+
 QSize VideoSource::imageSize() const {
   return m_currentImage.size();
 }

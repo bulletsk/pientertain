@@ -13,13 +13,14 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${pientertain_BINARY_DIR}/bin CACHE PATH "whe
 set(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#set(CMAKE_PREFIX_PATH ".;${CMAKE_PREFIX_PATH}")
-
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wl,-rpath-link,${CMAKE_SYSROOT}/opt/vc/lib")
-
+if (DEFINED CMAKE_SYSROOT)
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wl,-rpath-link,${CMAKE_SYSROOT}/opt/vc/lib")
+    find_package(raspicaminterface REQUIRED)
+else()
+    add_library(raspicaminterface raspicaminterfacedummy.cpp raspicaminterfacedummy.h)
+endif()
 
 find_package(Qt5 COMPONENTS Core Gui Network REQUIRED)
-find_package(raspicaminterface REQUIRED)
 
 add_executable(pientertain main.cpp
     hueauthentication.cpp

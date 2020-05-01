@@ -2,6 +2,7 @@
 #define RESTSERVER_HH
 
 #include <QTcpServer>
+#include <QJsonObject>
 
 class RESTServer : public QObject
 {
@@ -23,6 +24,7 @@ signals:
   void requestShutdown();
   void requestImage();
   void cornersChanged( QVector<QPoint> );
+  void cameraSettingsChanged( QJsonObject camSettingsJSON );
 
 public slots:
   // put status messages here
@@ -30,6 +32,7 @@ public slots:
   void onStreamStatus(QString status, bool err);
   void onVideoStatus(QString status, bool err);
   void onVideoImage(const QImage &image);
+  void onCameraSettingsChanged( QJsonObject json );
 
 protected slots:
   void onNewConnection();
@@ -51,9 +54,12 @@ private:
   QString m_streamStatus;
   QString m_videoStatus;
 
+  QJsonObject m_cameraSettings;
+
   QByteArray m_latestImageJPG;
 
   QVector<QPoint> m_corners;
+
 
 
 };

@@ -2,7 +2,11 @@
 #define VIDEOSOURCERASPBERRYCAM_HH
 
 #include <videosource.hh>
+#if WIN32
+#include <raspicaminterfacedummy.h>
+#else
 #include <raspicam/raspicaminterface_global.h>
+#endif
 
 class VideoSourceRaspberryCam : public VideoSource
 {
@@ -14,6 +18,9 @@ public:
 
   virtual void nextImage() override;
 
+public slots:
+  void setCameraSettings ( QJsonObject json ) override;
+
 protected:
 
 
@@ -23,6 +30,8 @@ protected:
   bool shutdownCamera();
 
   CameraHandle m_camera;
+
+  QJsonObject m_settings;
 
 };
 
