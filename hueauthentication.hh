@@ -27,6 +27,7 @@ public:
 
   QString userName() const;
   QString clientKey() const;
+  QString hueBridgeIp() const;
 
   LightGroup lightGroup(int number) const;
 
@@ -48,7 +49,7 @@ protected slots:
 
 private:
 
-  const QString m_appName;
+  QString m_appName;
 
   QString m_username;
   QString m_clientkey;

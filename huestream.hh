@@ -10,7 +10,7 @@ class HueStream : public QObject
 public:
   explicit HueStream(QObject *parent = nullptr);
 
-  void connectStream(QString username, QString clientkey);
+  void connectStream(QString username, QString clientkey, QString huebridge);
 
   virtual ~HueStream();
 

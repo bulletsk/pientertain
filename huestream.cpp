@@ -29,19 +29,19 @@ HueStream::HueStream( QObject *parent) : QObject(parent), m_dtls(nullptr), m_cli
 {
 }
 
-void HueStream::connectStream(QString username, QString clientkey) {
+void HueStream::connectStream(QString username, QString clientkey, QString huebridge) {
   m_username = username;
   m_clientkey = clientkey;
   QSslConfiguration config = QSslConfiguration::defaultDtlsConfiguration();
   config.setProtocol(QSsl::DtlsV1_2);
   config.setPeerVerifyMode(QSslSocket::VerifyNone);
-  QString huecipher = "PSK-AES128-GCM-SHA256"; // "TLS_AES_128_GCM_SHA256";
+  QString huecipher = "PSK-AES128-GCM-SHA256";
   QList<QSslCipher> ciphers;
   ciphers << QSslCipher(huecipher);
   config.setCiphers(ciphers);
 
   m_dtls = new QDtls(QSslSocket::SslClientMode);
-  m_dtls->setPeer(QHostAddress("192.168.2.101"), 2100);
+  m_dtls->setPeer(QHostAddress(huebridge), 2100);
   m_dtls->setDtlsConfiguration(config);
 
   connect(m_dtls, &QDtls::pskRequired, this, &HueStream::onPskRequired);
@@ -49,7 +49,7 @@ void HueStream::connectStream(QString username, QString clientkey) {
 
   m_clientSocket = new QUdpSocket;
   connect(m_clientSocket, &QUdpSocket::readyRead, this, &HueStream::onDataAvailable);
-  m_clientSocket->connectToHost(QHostAddress("192.168.2.101"), 2100);
+  m_clientSocket->connectToHost(QHostAddress(huebridge), 2100);
 
   if (!m_dtls->doHandshake(m_clientSocket)) {
     qDebug() << "error" << m_dtls->dtlsErrorString();

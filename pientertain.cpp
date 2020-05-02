@@ -67,7 +67,7 @@ void PiEntertain::onStreamingActive(bool on)
   if (on) {
     qDebug() << "streaming started";
 
-    m_stream.connectStream(m_auth.userName(), m_auth.clientKey());
+    m_stream.connectStream(m_auth.userName(), m_auth.clientKey(), m_auth.hueBridgeIp());
   } else {
     qDebug() << "streaming finished, framenr" << m_frameNumber;
     m_timer.stop();

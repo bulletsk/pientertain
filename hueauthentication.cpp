@@ -8,10 +8,6 @@
 HueAuthentication::HueAuthentication() : QObject(), m_appName("pientertain#valhalla"), m_huebridgeIp("192.168.2.101"), m_currentState(NoClientKey)
 {
   readSettings();
-
-//  m_username = "aSovHP9X3j7bzRD7Foxu90xBIEJHL0l99Sbtg6Q6";
-//  m_clientkey = "B68FD5B0E4AD16334303AE8A0D6CD403";
-
   qDebug() << m_username;
 }
 HueAuthentication::~HueAuthentication()
@@ -24,6 +20,9 @@ QString HueAuthentication::userName() const {
 }
 QString HueAuthentication::clientKey() const {
   return m_clientkey;
+}
+QString HueAuthentication::hueBridgeIp() const {
+  return m_huebridgeIp;
 }
 
 LightGroup HueAuthentication::lightGroup(int number) const
@@ -112,6 +111,8 @@ void HueAuthentication::readSettings()
   settings.beginGroup("auth");
   m_username = settings.value("user", "").toString();
   m_clientkey = settings.value("key", "").toString();
+  m_huebridgeIp = settings.value("bridgeIp", m_huebridgeIp).toString();
+  m_appName = settings.value("appName", m_appName).toString();
   settings.endGroup();
 }
 
@@ -121,6 +122,8 @@ void HueAuthentication::writeSettings()
   settings.beginGroup("auth");
   settings.setValue("user", m_username);
   settings.setValue("key", m_clientkey);
+  settings.setValue("bridgeIp", m_huebridgeIp);
+  settings.setValue("appName", m_appName);
   settings.endGroup();
 }
 

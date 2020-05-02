@@ -31,15 +31,6 @@ LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(
 
     }
   }
-  /*
-        "stream": {
-            "active": false,
-            "owner": null,
-            "proxymode": "auto",
-            "proxynode": "/bridge"
-        },
-        "type": "Entertainment"
-    },*/
 }
 
 int LightGroup::id() const
