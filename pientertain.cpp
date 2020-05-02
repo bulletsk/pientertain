@@ -90,7 +90,7 @@ void PiEntertain::onTimer() {
 
   if (m_currentPacket.numLights()==0) {
     // send default packet
-    for (auto light : lights) {
+    for (const Light &light : lights) {
       m_currentPacket.addLightData(light.id, 0,0,0);
     }
   }
