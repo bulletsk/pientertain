@@ -19,21 +19,20 @@ VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType 
 }
 
 
-VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false)
+VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(20), m_smoothCount(0)
 {
-  m_settings["area"] = 20;
-  m_settings["smooth"] = 0;
-
+  m_settings["area"] = m_areaSize;
+  m_settings["smooth"] = m_smoothCount;
   readSettings();
 }
 
 int VideoSource::area() const
 {
-  return m_settings.value("area").toInt(20);
+  return m_areaSize;
 }
 int VideoSource::smooth() const
 {
-  return m_settings.value("smooth").toInt(0);
+  return m_smoothCount;
 }
 
 
@@ -46,18 +45,21 @@ VideoSource::~VideoSource() {
 
 void VideoSource::readSettings()
 {
-  m_corners.clear();
+  QVector<QPoint> corners;
   QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
     if ( p.x() < 0) {
-      m_corners.clear();
+      corners.clear();
       break;
     }
-    m_corners.append(p);
+    corners.append(p);
   }
   settings.endGroup();
+  if (corners.size() == 4) {
+    setCorners(corners);
+  }
 }
 
 void VideoSource::writeSettings()
@@ -90,6 +92,18 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
     return;
   }
   m_corners = corners;
+
+  m_measurePoints.clear();
+
+  m_measurePoints << m_corners[CCTopLeft]
+         << m_corners[CCTopLeft] + ((m_corners[CCTopRight] - m_corners[CCTopLeft])/2)
+         << m_corners[CCTopRight]
+         << m_corners[CCTopLeft] + ((m_corners[CCBottomLeft] - m_corners[CCTopLeft])/2)
+         << m_corners[CCTopLeft] + ((m_corners[CCBottomRight] - m_corners[CCTopLeft])/2)
+         << m_corners[CCTopRight] + ((m_corners[CCBottomRight] - m_corners[CCTopRight])/2)
+         << m_corners[CCBottomLeft]
+         << m_corners[CCBottomLeft] + ((m_corners[CCBottomRight] - m_corners[CCBottomLeft])/2)
+         << m_corners[CCBottomRight];
 }
 
 void VideoSource::setCameraSettings (QJsonObject json )
@@ -97,10 +111,12 @@ void VideoSource::setCameraSettings (QJsonObject json )
   if (json.contains("area")) {
     int value = qBound(5, json.value("area").toInt(), 200);
     m_settings["area"] = value;
+    m_areaSize = value;
   }
   if (json.contains("smooth")) {
     int value = qBound(0, json.value("smooth").toInt(), 100);
     m_settings["smooth"] = value;
+    m_smoothCount = value;
   }
 }
 
@@ -144,15 +160,13 @@ void VideoSource::calculateColors()
     return;
   }
 
-  QVector<QPoint> curCorners;
-
   if (m_corners.size() != 4) {
-    curCorners.append( QPoint(0,0) );
-    curCorners.append( QPoint( m_currentImage.width()-1, 0) );
-    curCorners.append( QPoint( 0, m_currentImage.height()-1) );
-    curCorners.append( QPoint( m_currentImage.width()-1, m_currentImage.height()-1) );
-  } else {
-    curCorners = m_corners;
+    QVector<QPoint> defaultCorners;
+    defaultCorners.append( QPoint(0,0) );
+    defaultCorners.append( QPoint( m_currentImage.width()-1, 0) );
+    defaultCorners.append( QPoint( 0, m_currentImage.height()-1) );
+    defaultCorners.append( QPoint( m_currentImage.width()-1, m_currentImage.height()-1) );
+    setCorners(defaultCorners);
   }
 
   if (m_currentImage.format() != QImage::Format_RGB888) {
@@ -160,47 +174,41 @@ void VideoSource::calculateColors()
     return;
   }
 
-  QList<QPoint> points;
-  points << curCorners[CCTopLeft]
-         << curCorners[CCTopLeft] + ((curCorners[CCTopRight] - curCorners[CCTopLeft])/2)
-         << curCorners[CCTopRight]
-         << curCorners[CCTopLeft] + ((curCorners[CCBottomLeft] - curCorners[CCTopLeft])/2)
-         << curCorners[CCTopLeft] + ((curCorners[CCBottomRight] - curCorners[CCTopLeft])/2)
-         << curCorners[CCTopRight] + ((curCorners[CCBottomRight] - curCorners[CCTopRight])/2)
-         << curCorners[CCBottomLeft]
-         << curCorners[CCBottomLeft] + ((curCorners[CCBottomRight] - curCorners[CCBottomLeft])/2)
-         << curCorners[CCBottomRight];
-
   int corner = 0;
-  int areaSize = area();
-  for (QPoint point : points) {
+  const int areaSize = area();
 
-    //qDebug() << "CORNER" << point;
+  const int width = m_currentImage.width();
+  const int height = m_currentImage.height();
 
-    int xl = qMax(0, point.x()-areaSize);
-    int yl = qMax(0, point.y()-areaSize);
+  const unsigned char *data = m_currentImage.constBits();
 
-    int xr = qMin(m_currentImage.width(), point.x()+areaSize);
-    int yr = qMin(m_currentImage.height(), point.y()+areaSize);
+  for (QPoint point : m_measurePoints) {
+
+    const int xl = qMax(0, point.x()-areaSize);
+    const int yl = qMax(0, point.y()-areaSize);
+
+    const int xr = qMin(width, point.x()+areaSize);
+    const int yr = qMin(height, point.y()+areaSize);
 
     int num = 0;
     int r = 0;
     int g = 0;
     int b = 0;
 
+    int idx;
     for (int y=yl;y<yr;y++) {
       for (int x=xl;x<xr;x++) {
-        QColor color = m_currentImage.pixelColor(x,y);
-        r += color.red();
-        g += color.green();
-        b += color.blue();
+        idx = (y*width+x)*3;
+        r += (int)data[idx+0];
+        g += (int)data[idx+1];
+        b += (int)data[idx+2];
         ++num;
       }
     }
 
-    r /= (float)num;
-    g /= (float)num;
-    b /= (float)num;
+    r /= num;
+    g /= num;
+    b /= num;
 
     m_colors[corner] = QColor(r,g,b);
 

@@ -76,11 +76,13 @@ protected:
 protected:
   QVector<QColor> m_colors;
   QVector<QPoint> m_corners;
+  QList<QPoint> m_measurePoints;
   QImage m_currentImage;
   QImage m_latestImage;
   QString m_identifier;
-
   bool m_requestExit;
+  int m_areaSize;
+  int m_smoothCount;
 
   QJsonObject m_settings;
 
