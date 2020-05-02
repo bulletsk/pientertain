@@ -8,7 +8,7 @@ class VideoSourceImage : public VideoSource
   Q_OBJECT
 public:
   VideoSourceImage(const QString &sourceIdentifier="", QObject *parent=nullptr);
-  virtual ~VideoSourceImage() override;
+  virtual ~VideoSourceImage() override = default;
 protected:
   virtual void nextImage() override;
 

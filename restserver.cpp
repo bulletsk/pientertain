@@ -10,7 +10,9 @@
 #include <QJsonObject>
 #include <QSettings>
 
-RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(8999),
+const int s_serverPort = 8999;
+
+RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(s_serverPort),
   m_bridgeStatus("ok"), m_streamStatus("ok"), m_videoStatus("ok")
 {
   m_corners.append(QPoint(0,0));
@@ -168,51 +170,47 @@ void RESTServer::handleGet(QTcpSocket *socket, const QString &resource)
   } else if (resource == "/corners") {
 
     QJsonArray arr;
-    for (QPoint p : m_corners) {
+    for (const QPoint &p : qAsConst(m_corners)) {
       QJsonObject jp;
       jp["x"] = p.x();
       jp["y"] = p.y();
       arr.append(jp);
     }
-    QJsonDocument doc( arr );
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    const QJsonDocument doc( arr );
+    const QByteArray data = doc.toJson(QJsonDocument::Compact);
     send(socket, data, mimetype);
   } else if (resource == "/image") {
     emit requestImage();
     mimetype = "image/jpeg";
     if (m_latestImageJPG.isEmpty()) {
-      QImage img(1920,1080, QImage::Format_RGB32);
+      QImage img(640,480, QImage::Format_RGB888);
       img.fill(0);
       QByteArray imagedata;
       QBuffer qio(&imagedata);
       img.save(&qio, "jpg", 10);
+      send(socket, imagedata, mimetype);
+    } else {
+      send(socket, m_latestImageJPG, mimetype);
     }
-    send(socket, m_latestImageJPG, mimetype);
   } else if (resource == "/status") {
     QJsonObject obj;
     obj["bridge"] = m_bridgeStatus;
     obj["stream"] = m_streamStatus;
     obj["video"] = m_videoStatus;
     obj["camerasettings"] = m_cameraSettings;
-    QJsonDocument doc( obj );
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    const QJsonDocument doc( obj );
+    const QByteArray data = doc.toJson(QJsonDocument::Compact);
     send(socket, data, mimetype);
   } else if (resource == "/start") {
-    QJsonObject obj;
-    QJsonDocument doc( obj );
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    const QByteArray data = "{}";
     send(socket, data, mimetype);
     emit requestStart();
   } else if (resource == "/stop") {
-    QJsonObject obj;
-    QJsonDocument doc( obj );
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    const QByteArray data = "{}";
     send(socket, data, mimetype);
     emit requestStop();
   } else if (resource == "/shutdown") {
-    QJsonObject obj;
-    QJsonDocument doc( obj );
-    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    const QByteArray data = "{}";
     send(socket, data, mimetype);
     emit requestShutdown();
   } else {
@@ -227,32 +225,30 @@ void RESTServer::handlePut(QTcpSocket *socket, const QString &resource, const QB
   if (resource == "/corners") {
     QJsonDocument doc = QJsonDocument::fromJson(data);
     QVector<QPoint> points;
-    QJsonArray arr = doc.array();
-    for (QJsonValueRef v : arr) {
-      QJsonObject o = v.toObject();
+    const QJsonArray arr = doc.array();
+    for (const QJsonValue &v : arr) {
+      const QJsonObject o = v.toObject();
       QPoint p;
       p.setX( o["x"].toInt() );
       p.setY( o["y"].toInt() );
       points.append(p);
     }
-    QString mimetype = "application/json;charset=utf-8";
-    QJsonObject obj;
-    QJsonDocument docR( obj );
-    QByteArray reply = docR.toJson(QJsonDocument::Compact);
+    const QString mimetype = "application/json";
+    const QByteArray reply = "{}";
     send(socket, reply, mimetype);
     emit cornersChanged( points );
     if (points.length()==4) {
       m_corners = points;
     }
   } else if (resource == "/camsettings") {
-    QJsonDocument doc = QJsonDocument::fromJson(data);
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
     emit cameraSettingsChanged(doc.object());
   } else {
     sendError(socket);
   }
 }
 
-void RESTServer::send(QTcpSocket *socket, const QByteArray &data, const QString &mimetype)
+void RESTServer::send(QTcpSocket *socket, const QByteArray &data, const QString &mimetype) const
 {
   QString header = ""
       "HTTP/1.1 200 OK\r\n"
@@ -267,8 +263,10 @@ void RESTServer::send(QTcpSocket *socket, const QByteArray &data, const QString 
   socket->write(response);
 }
 
-void RESTServer::sendError(QTcpSocket *socket) {
-
+void RESTServer::sendError(QTcpSocket *socket) const
+{
+  // todo
+  Q_UNUSED(socket);
 }
 
 

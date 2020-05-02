@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QJsonObject>
 
-HueAuthentication::HueAuthentication() : QObject(), m_appName("pientertain#valhalla"), m_huebridgeIp("192.168.2.101"), m_currentState(NoClientKey)
+HueAuthentication::HueAuthentication() : QObject(), m_appName("pientertain#valhalla"), m_huebridgeIp("192.168.2.101"), m_reply(nullptr), m_currentState(NoClientKey)
 {
   readSettings();
   qDebug() << m_username;
@@ -151,17 +151,17 @@ void HueAuthentication::onRequestFinished()
   delete m_reply;
   m_reply = nullptr;
 
-  QJsonDocument doc = QJsonDocument::fromJson(m_response);
+  const QJsonDocument doc = QJsonDocument::fromJson(m_response);
   m_response.clear();
 
   switch( m_currentState ) {
   case NoClientKey:
   {
-    QJsonArray arr = doc.array();
-    for (QJsonValueRef ref : arr) {
-      QJsonObject obj = ref.toObject();
+    const QJsonArray arr = doc.array();
+    for (const QJsonValue &ref : arr) {
+      const QJsonObject obj = ref.toObject();
       if (obj.contains("error")) {
-        QString err = obj["error"].toObject()["description"].toString();
+        const QString err = obj["error"].toObject()["description"].toString();
         qDebug() << err;
         emit statusChanged(err, true);
         QTimer::singleShot(5000, this, &HueAuthentication::onAuthenticationStateChange);
@@ -177,15 +177,16 @@ void HueAuthentication::onRequestFinished()
   case FindEntertainmentGroup:
   {
     m_groups.clear();
-    QJsonObject obj = doc.object();
-    for (QString key : obj.keys()) {
+    const QJsonObject obj = doc.object();
+    const QStringList keys = obj.keys();
+    for (const QString &key : keys) {
       int id = key.toInt();
-      LightGroup lg = LightGroup(id, obj[key].toObject() );
+      const LightGroup lg = LightGroup(id, obj[key].toObject() );
       if (lg.type() == LightGroup::Entertainment) {
         m_groups.append( lg );
       }
     }
-    for (LightGroup &lg : m_groups) {
+    for (const LightGroup &lg : qAsConst(m_groups)) {
       lg.dump();
     }
     if (!m_groups.empty()) {
@@ -199,9 +200,9 @@ void HueAuthentication::onRequestFinished()
   case EnableStreaming:
   case DisableStreaming:
   {
-    QJsonArray arr = doc.array();
-    for (QJsonValueRef ref : arr) {
-      QJsonObject obj = ref.toObject();
+    const QJsonArray arr = doc.array();
+    for (const QJsonValue &ref : arr) {
+      const QJsonObject obj = ref.toObject();
       if (obj.contains("error")) {
         qDebug() << obj["error"].toObject()["description"].toString();
       } else if (obj.contains("success")) {

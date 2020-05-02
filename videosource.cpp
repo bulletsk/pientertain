@@ -5,6 +5,12 @@
 #include <QSettings>
 #include <QCoreApplication>
 
+const int s_minArea = 5;
+const int s_maxArea = 200;
+const int s_minSmooth = 0;
+const int s_maxSmooth = 100;
+
+
 VideoSource *VideoSource::createVideoSource(const QString &identifier, VideoSourceType type) {
   switch (type) {
   case Image:
@@ -109,12 +115,12 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
 void VideoSource::setCameraSettings (const QJsonObject &json )
 {
   if (json.contains("area")) {
-    int value = qBound(5, json.value("area").toInt(), 200);
+    int value = qBound(s_minArea, json.value("area").toInt(), s_maxArea);
     m_settings["area"] = value;
     m_areaSize = value;
   }
   if (json.contains("smooth")) {
-    int value = qBound(0, json.value("smooth").toInt(), 100);
+    int value = qBound(s_minSmooth, json.value("smooth").toInt(), s_maxSmooth);
     m_settings["smooth"] = value;
     m_smoothCount = value;
   }
@@ -129,7 +135,7 @@ void VideoSource::onRequestImage() {
 
 void VideoSource::run() {
 
-  m_colors.resize((int)CornerLast);
+  m_colors.resize(static_cast<int>(CornerLast));
 
   while (!m_requestExit) {
     m_imageLock.lock();
@@ -173,7 +179,7 @@ void VideoSource::calculateColors()
 
   const unsigned char *data = m_currentImage.constBits();
 
-  for (QPoint point : m_measurePoints) {
+  for (QPoint point : qAsConst(m_measurePoints)) {
 
     const int xl = qMax(0, point.x()-areaSize);
     const int yl = qMax(0, point.y()-areaSize);
@@ -190,16 +196,18 @@ void VideoSource::calculateColors()
     for (int y=yl;y<yr;y++) {
       for (int x=xl;x<xr;x++) {
         idx = (y*width+x)*3;
-        r += (int)data[idx+0];
-        g += (int)data[idx+1];
-        b += (int)data[idx+2];
+        r += static_cast<int>(data[idx+0]);
+        g += static_cast<int>(data[idx+1]);
+        b += static_cast<int>(data[idx+2]);
         ++num;
       }
     }
 
-    r /= num;
-    g /= num;
-    b /= num;
+    if (num > 0) {
+      r /= num;
+      g /= num;
+      b /= num;
+    }
 
     m_colors[corner] = QColor(r,g,b);
 

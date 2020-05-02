@@ -44,8 +44,8 @@ protected:
   void handleGet(QTcpSocket *socket, const QString &resource);
   void handlePut(QTcpSocket *socket, const QString &resource, const QByteArray &data);
 
-  void send(QTcpSocket *socket, const QByteArray &data, QString const &mimetype);
-  void sendError(QTcpSocket *socket);
+  void send(QTcpSocket *socket, const QByteArray &data, QString const &mimetype) const;
+  void sendError(QTcpSocket *socket) const;
 
 private:
   QTcpServer *m_serverSocket;

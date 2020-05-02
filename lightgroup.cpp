@@ -7,9 +7,9 @@ LightGroup::LightGroup() : m_id(-1){}
 LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(id)
 {
   if (contains("lights")) {
-    QJsonArray arr = value("lights").toArray();
-    for (QJsonValueRef ref : arr) {
-      QString sid = ref.toString();
+    const QJsonArray arr = value("lights").toArray();
+    for (const QJsonValue &ref : arr) {
+      const QString sid = ref.toString();
       m_lights.append( { sid.toInt(), QVector3D(0.0,0.0,0.0) } );
     }
   }
@@ -25,9 +25,9 @@ LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(
         qDebug() << "location can not be parsed";
         continue;
       }
-      light.pos.setX( arr[0].toDouble() );
-      light.pos.setY( arr[1].toDouble() );
-      light.pos.setZ( arr[2].toDouble() );
+      light.pos.setX( static_cast<float>(arr[0].toDouble()) );
+      light.pos.setY( static_cast<float>(arr[1].toDouble()) );
+      light.pos.setZ( static_cast<float>(arr[2].toDouble()) );
 
     }
   }

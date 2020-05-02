@@ -3,48 +3,43 @@
 #include <QDebug>
 #include <QtEndian>
 
+const char *s_protocol = "HueStream";
+const int s_protocolLength = 9;
+const int s_maxNumberofLights = 10;
+
 LightPacket::LightPacket()
 {
-  resize(16);
+  resize(sizeof(PacketHeader));
   fill(0);
+  memcpy(data(), s_protocol, s_protocolLength);
+  PacketHeader *header = (PacketHeader*)(data());
 
-  const char *protocol = "HueStream";
-  memcpy(data(), protocol, 9);
-
-  char version[2] = { 0x01, 0x00 };
-  memcpy(data()+9, version, 2);
-
-  char mode = 0x00; // 0x01 xy brightness, 0x00 rgb
-  memcpy(data()+14, &mode, 1);
+  header->versionMajor = 0x01;
+  header->versionMinor = 0x00;
+  header->colorSpace = 0x00; // 0x01 xy brightness, 0x00 rgb
 
 }
 
 void LightPacket::setSequenceNumber(int num) {
   char cNum = (num % 256);
-  memcpy(data()+11, &cNum, 1);
+  PacketHeader *header = reinterpret_cast<PacketHeader*>(data());
+  header->sequenceNumber = cNum;
 }
 
-void LightPacket::addLightData(unsigned short id, unsigned short r, unsigned short g, unsigned short b)
+void LightPacket::addLightData(const uint16_t id, const uint16_t r, const uint16_t g, const uint16_t b)
 {
 
   if (maxLights() == numLights()) {
     qDebug() << "packet has max size";
     return;
   }
-  QByteArray lightdata(9,Qt::Uninitialized);
-  char *data = lightdata.data();
-
-  char type = 0; // type light
-  unsigned short nId = qToBigEndian(id);
-  unsigned short nR = qToBigEndian(r);
-  unsigned short nG = qToBigEndian(g);
-  unsigned short nB = qToBigEndian(b);
-
-  memcpy(data, &type, 1);
-  memcpy(data+1, (const char*)&nId, 2);
-  memcpy(data+3, (const char*)&nR, 2);
-  memcpy(data+5, (const char*)&nG, 2);
-  memcpy(data+7, (const char*)&nB, 2);
+  QByteArray lightdata(1+sizeof(LightData),Qt::Uninitialized);
+  memset(lightdata.data(), 0x00, 1); // type is light
+  LightData *data = (LightData*)(lightdata.data()+1);
+  data->id = qToBigEndian(id);
+  data->r = qToBigEndian(r);
+  data->g = qToBigEndian(g);
+  data->b = qToBigEndian(b);
 
   append(lightdata);
 
@@ -52,36 +47,13 @@ void LightPacket::addLightData(unsigned short id, unsigned short r, unsigned sho
 
 //void LightPacket::addLightData(unsigned short id, unsigned short x, unsigned short y, unsigned short brightness)
 //{
-
-//  if (maxLights() == numLights()) {
-//    qDebug() << "packet has max size";
-//    return;
-//  }
-//  QByteArray lightdata(9,Qt::Uninitialized);
-//  char *data = lightdata.data();
-
-//  char type = 0; // type light
-//  unsigned short nId = qToBigEndian(id);
-//  unsigned short nX = qToBigEndian(x);
-//  unsigned short nY = qToBigEndian(y);
-//  unsigned short nB = qToBigEndian(brightness);
-
-//  memcpy(data, &type, 1);
-//  memcpy(data+1, (const char*)&nId, 2);
-//  memcpy(data+3, (const char*)&nX, 2);
-//  memcpy(data+5, (const char*)&nY, 2);
-//  memcpy(data+7, (const char*)&nB, 2);
-
-//  append(lightdata);
-
 //}
-
 
 int LightPacket::numLights() const
 {
-  return (size()-16)/9;
+  return (size()-sizeof(PacketHeader))/sizeof(LightData);
 }
 int LightPacket::maxLights() const
 {
-  return 10;
+  return s_maxNumberofLights;
 }
