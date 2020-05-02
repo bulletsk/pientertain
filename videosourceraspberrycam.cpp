@@ -12,11 +12,11 @@ VideoSourceRaspberryCam::VideoSourceRaspberryCam(QString sourceIdentifier, QObje
 {
   // default settings
   m_settings["brightness"] = 50;
-  m_settings["saturation"] = 0;
+  m_settings["saturation"] = 100;
   m_settings["contrast"] = 0;
-  m_settings["whitebalance_r"] = 0;
-  m_settings["whitebalance_b"] = 0;
-  m_settings["iso"] = 40;
+  m_settings["whitebalance_r"] = 2;
+  m_settings["whitebalance_b"] = 2;
+  m_settings["iso"] = 400;
   m_settings["shutter"] = 40000;
 }
 

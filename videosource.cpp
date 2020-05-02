@@ -157,11 +157,11 @@ void VideoSource::calculateColors()
 
     //qDebug() << "CORNER" << point;
 
-    int xl = qMax(0, point.x()-50);
-    int yl = qMax(0, point.y()-50);
+    int xl = qMax(0, point.x()-20);
+    int yl = qMax(0, point.y()-20);
 
-    int xr = qMin(m_currentImage.width(), point.x()+50);
-    int yr = qMin(m_currentImage.height(), point.y()+50);
+    int xr = qMin(m_currentImage.width(), point.x()+20);
+    int yr = qMin(m_currentImage.height(), point.y()+20);
 
     int num = 0;
     int r = 0;
