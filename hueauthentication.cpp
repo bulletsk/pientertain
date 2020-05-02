@@ -34,6 +34,10 @@ LightGroup HueAuthentication::lightGroup(int number) const
 
 void HueAuthentication::startAuthentication()
 {
+  if (m_currentState == EnableStreaming) {
+    // we are started already
+    return;
+  }
   if (m_clientkey.length() == 0) {
     m_currentState = NoClientKey;
   } else {
@@ -45,6 +49,10 @@ void HueAuthentication::startAuthentication()
 
 void HueAuthentication::stopStreaming()
 {
+  if (m_currentState == DisableStreaming) {
+    // we are stopped already
+    return;
+  }
   m_currentState = DisableStreaming;
   onAuthenticationStateChange();
 }

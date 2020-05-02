@@ -47,6 +47,9 @@ public:
   virtual QSize imageSize() const;
   QImage currentImage() const;
 
+  int area() const;
+  int smooth() const;
+
   void stop();
 
   void readSettings();
@@ -78,6 +81,9 @@ protected:
   QString m_identifier;
 
   bool m_requestExit;
+
+  QJsonObject m_settings;
+
 
   QMutex m_imageLock;
 

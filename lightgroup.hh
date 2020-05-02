@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QVector3D>
 #include <QVector>
+#include <QList>
 
 class LightGroup : public QJsonObject
 {

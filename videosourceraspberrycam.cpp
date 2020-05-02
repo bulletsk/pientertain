@@ -26,8 +26,7 @@ VideoSourceRaspberryCam::~VideoSourceRaspberryCam() {
 
 void VideoSourceRaspberryCam::setCameraSettings ( QJsonObject json ) {
 
-  m_settings = json;
-
+  VideoSource::setCameraSettings(json);
   if (json.contains("brightness")) {
     int value = qBound(0, json.value("brightness").toInt(), 100);
     m_settings["brightness"] = value;
@@ -37,7 +36,7 @@ void VideoSourceRaspberryCam::setCameraSettings ( QJsonObject json ) {
   }
 
   if (json.contains("saturation")) {
-    int value = qBound(-100, json.value("brightness").toInt(), 100);
+    int value = qBound(-100, json.value("saturation").toInt(), 100);
     m_settings["saturation"] = value;
     if (m_camera) {
       raspicam_set_saturation(m_camera, value);

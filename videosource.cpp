@@ -21,9 +21,21 @@ VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType 
 
 VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false)
 {
+  m_settings["area"] = 20;
+  m_settings["smooth"] = 0;
 
   readSettings();
 }
+
+int VideoSource::area() const
+{
+  return m_settings.value("area").toInt(20);
+}
+int VideoSource::smooth() const
+{
+  return m_settings.value("smooth").toInt(0);
+}
+
 
 VideoSource::~VideoSource() {
   writeSettings();
@@ -80,9 +92,16 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
   m_corners = corners;
 }
 
-void VideoSource::setCameraSettings (QJsonObject )
+void VideoSource::setCameraSettings (QJsonObject json )
 {
-  qDebug() << "settings not applied for this image source";
+  if (json.contains("area")) {
+    int value = qBound(5, json.value("area").toInt(), 200);
+    m_settings["area"] = value;
+  }
+  if (json.contains("smooth")) {
+    int value = qBound(0, json.value("smooth").toInt(), 100);
+    m_settings["smooth"] = value;
+  }
 }
 
 
@@ -153,15 +172,16 @@ void VideoSource::calculateColors()
          << curCorners[CCBottomRight];
 
   int corner = 0;
+  int areaSize = area();
   for (QPoint point : points) {
 
     //qDebug() << "CORNER" << point;
 
-    int xl = qMax(0, point.x()-20);
-    int yl = qMax(0, point.y()-20);
+    int xl = qMax(0, point.x()-areaSize);
+    int yl = qMax(0, point.y()-areaSize);
 
-    int xr = qMin(m_currentImage.width(), point.x()+20);
-    int yr = qMin(m_currentImage.height(), point.y()+20);
+    int xr = qMin(m_currentImage.width(), point.x()+areaSize);
+    int yr = qMin(m_currentImage.height(), point.y()+areaSize);
 
     int num = 0;
     int r = 0;

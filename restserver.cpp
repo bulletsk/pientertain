@@ -53,15 +53,14 @@ void RESTServer::readSettings()
 
 void RESTServer::writeSettings()
 {
-  if (m_corners.size() != 4) {
-    return;
-  }
   QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
-  settings.beginGroup("servercorners");
-  for (int i=1;i<=4;i++) {
-    settings.setValue("point"+QString::number(i), m_corners[i-1]);
+  if (m_corners.size() == 4) {
+    settings.beginGroup("servercorners");
+    for (int i=1;i<=4;i++) {
+      settings.setValue("point"+QString::number(i), m_corners[i-1]);
+    }
+    settings.endGroup();
   }
-  settings.endGroup();
   if (!m_cameraSettings.empty()) {
     QJsonDocument doc(m_cameraSettings);
     QString val = doc.toJson(QJsonDocument::Compact);
@@ -153,6 +152,11 @@ void RESTServer::onVideoImage(const QImage &image)
   QBuffer qio(&m_latestImageJPG);
   image.save(&qio, "jpg", 10);
 }
+
+QJsonObject RESTServer::cameraSettings() const {
+  return m_cameraSettings;
+}
+
 
 void RESTServer::onCameraSettingsChanged( QJsonObject json )
 {

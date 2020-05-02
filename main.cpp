@@ -35,6 +35,8 @@ public:
 
     connect(&m_timer, &QTimer::timeout, this, &StreamClient::onTimer);
 
+    m_videoSource->setCameraSettings(m_server.cameraSettings());
+
     m_frameNumber = 0;
   }
 
@@ -63,6 +65,13 @@ public slots:
   }
 
   void shutDown() {
+    stopStreaming();
+    QString shutdownCommand = "/sbin/shutdown now";
+#ifdef WIN32
+    qDebug() << shutdownCommand;
+#else
+    QProcess::execute("/sbin/shutdown now");
+#endif
     QCoreApplication::exit(0);
   }
 
@@ -75,7 +84,6 @@ public slots:
     } else {
       qDebug() << "streaming finished, framenr" << m_frameNumber;
       m_timer.stop();
-      QCoreApplication::exit(0);
     }
   }
 
@@ -114,11 +122,30 @@ public slots:
     LightGroup group = m_auth.lightGroup(0);
     QVector<LightGroup::Light> lights = group.lights();
 
+    if (m_prevColors.size() < lights.size()) {
+      m_prevColors.resize(lights.size());
+    }
+
     m_currentPacket = LightPacket();
 
     for (int i=0;i<lights.size();i++) {
       LightGroup::Light light = lights[i];
       QVector3D mixedColor = mixColorForPosition( light.pos, colorVector );
+
+      int smooth = m_videoSource->smooth();
+      if (smooth > 0) {
+        m_prevColors[i].push_back(mixedColor);
+      }
+      while (m_prevColors[i].size() > smooth) {
+        m_prevColors[i].pop_front();
+      }
+      if (smooth > 0 && m_prevColors[i].size()>0) {
+        mixedColor = QVector3D(0.0f,0.0f,0.0f);
+        for (QVector3D cur : m_prevColors[i]) {
+          mixedColor += cur;
+        }
+        mixedColor /= (float)m_prevColors[i].size();
+      }
 //      qDebug() << fakePos << mixedColor;
       m_currentPacket.addLightData(light.id, (uint16_t)(mixedColor.x()*65535.0),(uint16_t)(mixedColor.y()*65535.0),(uint16_t)(mixedColor.z()*65535.0));
     }
@@ -210,6 +237,8 @@ public slots:
   RESTServer m_server;
 
   LightPacket m_currentPacket;
+
+  QVector< QList< QVector3D > > m_prevColors;
 };
 
 

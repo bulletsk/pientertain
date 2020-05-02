@@ -31,7 +31,6 @@ protected:
 
   CameraHandle m_camera;
 
-  QJsonObject m_settings;
 
 };
 
