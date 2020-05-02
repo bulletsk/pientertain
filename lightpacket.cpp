@@ -48,7 +48,7 @@ void LightPacket::addLightData(const uint16_t id, const uint16_t r, const uint16
 
 int LightPacket::numLights() const
 {
-  return (size()-sizeof(PacketHeader))/sizeof(LightData);
+  return (size()-sizeof(PacketHeader))/(sizeof(LightData)+1);
 }
 int LightPacket::maxLights() const
 {
