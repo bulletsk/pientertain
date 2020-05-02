@@ -66,11 +66,11 @@ public slots:
 
   void shutDown() {
     stopStreaming();
-    QString shutdownCommand = "/sbin/shutdown now";
+    QString shutdownCommand = "sudo /sbin/shutdown now";
 #ifdef WIN32
     qDebug() << shutdownCommand;
 #else
-    QProcess::execute("/sbin/shutdown now");
+    QProcess::execute(shutdownCommand);
 #endif
     QCoreApplication::exit(0);
   }
