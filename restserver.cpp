@@ -10,7 +10,7 @@
 #include <QJsonObject>
 #include <QSettings>
 
-const int s_serverPort = 8999;
+static const int s_serverPort = 8999;
 
 RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(s_serverPort),
   m_bridgeStatus("ok"), m_streamStatus("ok"), m_videoStatus("ok")

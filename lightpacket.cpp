@@ -3,26 +3,23 @@
 #include <QDebug>
 #include <QtEndian>
 
-const char *s_protocol = "HueStream";
-const int s_protocolLength = 9;
-const int s_maxNumberofLights = 10;
+static const char *s_protocol = "HueStream";
+static const int s_protocolLength = 9;
+static const int s_maxNumberofLights = 10;
 
-LightPacket::LightPacket()
+LightPacket::LightPacket() : QByteArray(sizeof(PacketHeader), 0)
 {
-  resize(sizeof(PacketHeader));
-  fill(0);
   memcpy(data(), s_protocol, s_protocolLength);
   PacketHeader *header = (PacketHeader*)(data());
 
   header->versionMajor = 0x01;
-  header->versionMinor = 0x00;
-  header->colorSpace = 0x00; // 0x01 xy brightness, 0x00 rgb
-
+//  header->versionMinor = 0x00;
+//  header->colorSpace = 0x00; // 0x01 xy brightness, 0x00 rgb
 }
 
 void LightPacket::setSequenceNumber(int num) {
   char cNum = (num % 256);
-  PacketHeader *header = reinterpret_cast<PacketHeader*>(data());
+  PacketHeader *header = (PacketHeader*)(data());
   header->sequenceNumber = cNum;
 }
 

@@ -8,21 +8,21 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-const int s_defaultBrightness = 50;
-const int s_defaultSaturation = 100;
-const int s_defaultContrast = 0;
-const int s_defaultWb_r = 2;
-const int s_defaultWb_b = 2;
-const int s_defaultIso = 400;
-const int s_defaultShutter = 40000;
-const int s_imageWidth = 640;
-const int s_imageHeight = 480;
-const int s_maxShutter = 330000;
-const int s_minIso = 100;
-const int s_maxIso = 800;
-const int s_maxWb = 8;
-const int s_minRangeValue = -100;
-const int s_maxRangeValue = 100;
+static const int s_defaultBrightness = 50;
+static const int s_defaultSaturation = 100;
+static const int s_defaultContrast = 0;
+static const int s_defaultWb_r = 2;
+static const int s_defaultWb_b = 2;
+static const int s_defaultIso = 400;
+static const int s_defaultShutter = 40000;
+static const int s_imageWidth = 640;
+static const int s_imageHeight = 480;
+static const int s_maxShutter = 330000;
+static const int s_minIso = 100;
+static const int s_maxIso = 800;
+static const int s_maxWb = 8;
+static const int s_minRangeValue = -100;
+static const int s_maxRangeValue = 100;
 
 VideoSourceRaspberryCam::VideoSourceRaspberryCam(const QString &sourceIdentifier, QObject *parent) : VideoSource(sourceIdentifier, parent), m_camera(nullptr)
 {

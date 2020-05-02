@@ -5,11 +5,12 @@
 #include <QSettings>
 #include <QCoreApplication>
 
-const int s_minArea = 5;
-const int s_maxArea = 200;
-const int s_minSmooth = 0;
-const int s_maxSmooth = 100;
-
+static const int s_minArea = 5;
+static const int s_maxArea = 200;
+static const int s_minSmooth = 0;
+static const int s_maxSmooth = 100;
+static const int s_defaultAreaSize = 20;
+static const int s_defaultSmooth = 0;
 
 VideoSource *VideoSource::createVideoSource(const QString &identifier, VideoSourceType type) {
   switch (type) {
@@ -25,7 +26,7 @@ VideoSource *VideoSource::createVideoSource(const QString &identifier, VideoSour
 }
 
 
-VideoSource::VideoSource(const QString &sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(20), m_smoothCount(0)
+VideoSource::VideoSource(const QString &sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(s_defaultAreaSize), m_smoothCount(s_defaultSmooth)
 {
   m_settings["area"] = m_areaSize;
   m_settings["smooth"] = m_smoothCount;
