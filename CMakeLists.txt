@@ -39,6 +39,8 @@ add_executable(pientertain main.cpp
     videosourceraspberrycam.hh
     restserver.cpp
     restserver.hh
+    pientertain.cpp
+    pientertain.hh
 )
 
 target_link_libraries(pientertain raspicaminterface Qt5::Network Qt5::Gui Qt5::Core)
