@@ -12,7 +12,7 @@ public:
 
   void connectStream(QString username, QString clientkey);
 
-  ~HueStream();
+  virtual ~HueStream();
 
   void send(const LightPacket &lp);
   void stop();

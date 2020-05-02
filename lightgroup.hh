@@ -6,6 +6,11 @@
 #include <QVector>
 #include <QList>
 
+struct Light {
+  int id;
+  QVector3D pos;
+};
+
 class LightGroup : public QJsonObject
 {
 public:
@@ -16,11 +21,6 @@ public:
     Group,
     Unknown,
     Invalid
-  };
-
-  struct Light {
-    int id;
-    QVector3D pos;
   };
 
   LightGroup();

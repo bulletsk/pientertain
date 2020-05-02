@@ -88,7 +88,7 @@ QString LightGroup::entertainmentClass() const
   return value("class").toString();
 }
 
-QVector<LightGroup::Light> LightGroup::lights() const
+QVector<Light> LightGroup::lights() const
 {
   return m_lights;
 }

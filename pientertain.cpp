@@ -86,12 +86,12 @@ void PiEntertain::onStreamEstablished(bool on)
 
 void PiEntertain::onTimer() {
   LightGroup group = m_auth.lightGroup(0);
-  QVector<LightGroup::Light> lights = group.lights();
+  QVector<Light> lights = group.lights();
 
   if (m_currentPacket.numLights()==0) {
     // send default packet
     for (int i=0;i<lights.size();i++) {
-      LightGroup::Light light = lights[i];
+      Light light = lights[i];
       m_currentPacket.addLightData(light.id, 0,0,0);
     }
   }
@@ -103,7 +103,7 @@ void PiEntertain::onTimer() {
 void PiEntertain::onNewColors( QVector<QColor> colorVector )
 {
   LightGroup group = m_auth.lightGroup(0);
-  QVector<LightGroup::Light> lights = group.lights();
+  QVector<Light> lights = group.lights();
 
   if (m_prevColors.size() < lights.size()) {
     m_prevColors.resize(lights.size());
@@ -112,7 +112,7 @@ void PiEntertain::onNewColors( QVector<QColor> colorVector )
   m_currentPacket = LightPacket();
 
   for (int i=0;i<lights.size();i++) {
-    LightGroup::Light light = lights[i];
+    Light light = lights[i];
     QVector3D mixedColor = mixColorForPosition( light.pos, colorVector );
 
     int smooth = m_videoSource->smooth();
