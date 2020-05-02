@@ -37,15 +37,12 @@ public:
     CCBottomRight
   };
 
-  explicit VideoSource(QString sourceIdentifier="", QObject *parent = nullptr);
+  explicit VideoSource(const QString &sourceIdentifier="", QObject *parent = nullptr);
   virtual ~VideoSource();
 
-  static VideoSource *createVideoSource(QString identifier, VideoSourceType type);
+  static VideoSource *createVideoSource(const QString &identifier, VideoSourceType type);
 
   QVector<QPoint> corners() const;
-
-  virtual QSize imageSize() const;
-  QImage currentImage() const;
 
   int area() const;
   int smooth() const;
@@ -64,7 +61,7 @@ signals:
 public slots:
   void onRequestImage();
   void setCorners( const QVector<QPoint> &corners);
-  virtual void setCameraSettings (QJsonObject jsonString );
+  virtual void setCameraSettings (const QJsonObject &json );
 
 protected:
   void run() override;

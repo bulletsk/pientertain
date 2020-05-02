@@ -10,17 +10,12 @@
 #include <QJsonObject>
 #include <QSettings>
 
-RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(8999)
+RESTServer::RESTServer(QObject *parent) : QObject(parent), m_serverSocket(new QTcpServer), m_listenPort(8999),
+  m_bridgeStatus("ok"), m_streamStatus("ok"), m_videoStatus("ok")
 {
-
-  m_bridgeStatus = "ok";
-  m_streamStatus = "ok";
-  m_videoStatus = "ok";
-
   m_corners.append(QPoint(0,0));
 
   readSettings();
-
 }
 
 RESTServer::~RESTServer()
@@ -158,7 +153,7 @@ QJsonObject RESTServer::cameraSettings() const {
 }
 
 
-void RESTServer::onCameraSettingsChanged( QJsonObject json )
+void RESTServer::onCameraSettingsChanged( const QJsonObject &json )
 {
   m_cameraSettings = json;
 }
@@ -257,7 +252,7 @@ void RESTServer::handlePut(QTcpSocket *socket, const QString &resource, const QB
   }
 }
 
-void RESTServer::send(QTcpSocket *socket, const QByteArray &data, QString &mimetype)
+void RESTServer::send(QTcpSocket *socket, const QByteArray &data, const QString &mimetype)
 {
   QString header = ""
       "HTTP/1.1 200 OK\r\n"
@@ -277,16 +272,16 @@ void RESTServer::sendError(QTcpSocket *socket) {
 }
 
 
-void RESTServer::onBridgeStatus(QString status, bool err)
+void RESTServer::onBridgeStatus(const QString &status, bool err)
 {
   m_bridgeStatus = (err ? "E " : "S ") + status;
 }
 
-void RESTServer::onStreamStatus(QString status, bool err)
+void RESTServer::onStreamStatus(const QString &status, bool err)
 {
   m_streamStatus = (err ? "E " : "S ") + status;
 }
-void RESTServer::onVideoStatus(QString status, bool err)
+void RESTServer::onVideoStatus(const QString &status, bool err)
 {
   m_videoStatus = (err ? "E " : "S ") + status;
 }

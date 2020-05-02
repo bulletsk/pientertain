@@ -14,13 +14,13 @@ LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(
     }
   }
   if (contains("locations")) {
-    QJsonObject obj = value("locations").toObject();
+    QJsonObject locations = value("locations").toObject();
     for (Light &light : m_lights) {
       QString key = QString::number(light.id);
-      if (!obj.contains(key)) {
+      if (!locations.contains(key)) {
         continue;
       }
-      QJsonArray arr = obj[key].toArray();
+      QJsonArray arr = locations[key].toArray();
       if (arr.size()<3) {
         qDebug() << "location can not be parsed";
         continue;

@@ -11,32 +11,25 @@ class PiEntertain : public QObject {
 
 public:
   PiEntertain();
+  virtual ~PiEntertain();
 
   void start();
-
   void startServer();
-
-  virtual ~PiEntertain();
 
 public slots:
   void startStreaming();
-
   void stopStreaming();
-
   void shutDown();
-
   void onStreamingActive(bool on);
-
   void onStreamEstablished(bool on);
+  void onNewColors( const QVector<QColor> &colorVector );
+
+protected slots:
   void onTimer();
 
-  void onNewColors( QVector<QColor> colorVector );
-
+private:
   QVector3D mixColorForPosition( const QVector3D &pos, const QVector<QColor> &colorVector );
- private:
-
   QVector3D colorToVector(const QColor &c) const;
-  QColor vectorToColor(const QVector3D &c) const;
 
   HueAuthentication m_auth;
   HueStream m_stream;

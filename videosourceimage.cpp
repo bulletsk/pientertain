@@ -1,7 +1,7 @@
 #include "videosourceimage.hh"
 #include <QDebug>
 
-VideoSourceImage::VideoSourceImage(QString sourceIdentifier, QObject *parent)
+VideoSourceImage::VideoSourceImage(const QString &sourceIdentifier, QObject *parent)
   : VideoSource(sourceIdentifier, parent)
 {
 

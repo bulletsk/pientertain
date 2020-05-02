@@ -100,7 +100,7 @@ void PiEntertain::onTimer() {
   m_frameNumber++;
 }
 
-void PiEntertain::onNewColors( QVector<QColor> colorVector )
+void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
 {
   LightGroup group = m_auth.lightGroup(0);
   QVector<Light> lights = group.lights();
@@ -123,10 +123,7 @@ void PiEntertain::onNewColors( QVector<QColor> colorVector )
       m_prevColors[i].pop_front();
     }
     if (smooth > 0 && m_prevColors[i].size()>0) {
-      mixedColor = QVector3D(0.0f,0.0f,0.0f);
-      for (QVector3D cur : m_prevColors[i]) {
-        mixedColor += cur;
-      }
+      mixedColor = std::accumulate(m_prevColors[i].begin(), m_prevColors[i].end(), QVector3D(0.0f,0.0f,0.0f));
       mixedColor /= (float)m_prevColors[i].size();
     }
     m_currentPacket.addLightData(light.id, (uint16_t)(mixedColor.x()*65535.0),(uint16_t)(mixedColor.y()*65535.0),(uint16_t)(mixedColor.z()*65535.0));
@@ -199,10 +196,4 @@ QVector3D PiEntertain::mixColorForPosition( const QVector3D &pos, const QVector<
 QVector3D PiEntertain::colorToVector(const QColor &c) const
 {
   return QVector3D( c.redF(), c.greenF(), c.blueF() );
-}
-QColor PiEntertain::vectorToColor(const QVector3D &c) const
-{
-  QColor ret;
-  ret.setRgb( (int)c.x()*255.0f, (int)c.y()*255.0f, (int)c.z()*255.0f );
-  return ret;
 }

@@ -5,20 +5,11 @@
 CameraHandle raspicam_create_camera()
 {
   unsigned char *ret = new unsigned char[640*480*3];
-
-  unsigned char r=0;
-  unsigned char g=0;
-  unsigned char b=0;
-
   for (int y=0;y<480;y++) {
     for (int x=0;x<640;x++) {
-
-      r = (x%255);
-      g = (y%255);
-      b = ((x+y)%255);
-      ret[ 3*(y*640+x)+0 ] = r;
-      ret[ 3*(y*640+x)+1 ] = g;
-      ret[ 3*(y*640+x)+2 ] = b;
+      ret[ 3*(y*640+x)+0 ] = (x%255);
+      ret[ 3*(y*640+x)+1 ] = (y%255);
+      ret[ 3*(y*640+x)+2 ] = ((x+y)%255);
     }
   }
 

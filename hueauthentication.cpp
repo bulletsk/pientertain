@@ -101,6 +101,8 @@ void HueAuthentication::onAuthenticationStateChange()
     connect(m_reply, &QIODevice::readyRead, this, &HueAuthentication::onDataAvailable);
   }
     break;
+  default:
+    break;
   }
 }
 
@@ -152,8 +154,6 @@ void HueAuthentication::onRequestFinished()
   QJsonDocument doc = QJsonDocument::fromJson(m_response);
   m_response.clear();
 
-  bool exit = true;
-
   switch( m_currentState ) {
   case NoClientKey:
   {
@@ -165,7 +165,6 @@ void HueAuthentication::onRequestFinished()
         qDebug() << err;
         emit statusChanged(err, true);
         QTimer::singleShot(5000, this, &HueAuthentication::onAuthenticationStateChange);
-        exit = false;
       } else if (obj.contains("success")) {
         qDebug() << doc.toJson(QJsonDocument::Compact);
         m_username = obj["success"].toObject()["username"].toString();
@@ -186,13 +185,10 @@ void HueAuthentication::onRequestFinished()
         m_groups.append( lg );
       }
     }
-//    qDebug().noquote() << doc.toJson();
-
     for (LightGroup &lg : m_groups) {
       lg.dump();
     }
     if (!m_groups.empty()) {
-      exit = false;
       m_currentState = EnableStreaming;
       QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
     } else {
@@ -208,12 +204,10 @@ void HueAuthentication::onRequestFinished()
       QJsonObject obj = ref.toObject();
       if (obj.contains("error")) {
         qDebug() << obj["error"].toObject()["description"].toString();
-        exit = false;
       } else if (obj.contains("success")) {
         qDebug() << doc.toJson(QJsonDocument::Compact);
         if (m_currentState == EnableStreaming) {
           m_currentState = DisableStreaming;
-          exit = false;
           emit streamingActive(true);
           emit statusChanged("stream enabled", false);
         } else {
@@ -224,6 +218,8 @@ void HueAuthentication::onRequestFinished()
       }
     }
   }
+    break;
+  default:
     break;
   }
 }

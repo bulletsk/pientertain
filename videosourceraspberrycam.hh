@@ -12,14 +12,14 @@ class VideoSourceRaspberryCam : public VideoSource
 {
   Q_OBJECT
 public:
-  VideoSourceRaspberryCam(QString sourceIdentifier="", QObject *parent = nullptr);
+  VideoSourceRaspberryCam(const QString &sourceIdentifier="", QObject *parent = nullptr);
 
   virtual ~VideoSourceRaspberryCam() override;
 
   virtual void nextImage() override;
 
 public slots:
-  void setCameraSettings ( QJsonObject json ) override;
+  void setCameraSettings (const QJsonObject &json ) override;
 
 protected:
 

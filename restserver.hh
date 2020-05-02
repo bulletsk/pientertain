@@ -25,16 +25,16 @@ signals:
   void requestStop();
   void requestShutdown();
   void requestImage();
-  void cornersChanged( QVector<QPoint> );
-  void cameraSettingsChanged( QJsonObject camSettingsJSON );
+  void cornersChanged( const QVector<QPoint>& );
+  void cameraSettingsChanged( const QJsonObject &camSettingsJSON );
 
 public slots:
   // put status messages here
-  void onBridgeStatus(QString status, bool err);
-  void onStreamStatus(QString status, bool err);
-  void onVideoStatus(QString status, bool err);
+  void onBridgeStatus(const QString &status, bool err);
+  void onStreamStatus(const QString &status, bool err);
+  void onVideoStatus(const QString &status, bool err);
   void onVideoImage(const QImage &image);
-  void onCameraSettingsChanged( QJsonObject json );
+  void onCameraSettingsChanged(const QJsonObject &json );
 
 protected slots:
   void onNewConnection();
@@ -44,7 +44,7 @@ protected:
   void handleGet(QTcpSocket *socket, const QString &resource);
   void handlePut(QTcpSocket *socket, const QString &resource, const QByteArray &data);
 
-  void send(QTcpSocket *socket, const QByteArray &data, QString &mimetype);
+  void send(QTcpSocket *socket, const QByteArray &data, QString const &mimetype);
   void sendError(QTcpSocket *socket);
 
 private:

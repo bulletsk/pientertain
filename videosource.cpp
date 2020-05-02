@@ -5,7 +5,7 @@
 #include <QSettings>
 #include <QCoreApplication>
 
-VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType type) {
+VideoSource *VideoSource::createVideoSource(const QString &identifier, VideoSourceType type) {
   switch (type) {
   case Image:
     return new VideoSourceImage(identifier, nullptr);
@@ -19,7 +19,7 @@ VideoSource *VideoSource::createVideoSource(QString identifier, VideoSourceType 
 }
 
 
-VideoSource::VideoSource(QString sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(20), m_smoothCount(0)
+VideoSource::VideoSource(const QString &sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(20), m_smoothCount(0)
 {
   m_settings["area"] = m_areaSize;
   m_settings["smooth"] = m_smoothCount;
@@ -106,7 +106,7 @@ void VideoSource::setCorners( const QVector<QPoint> &corners)
          << m_corners[CCBottomRight];
 }
 
-void VideoSource::setCameraSettings (QJsonObject json )
+void VideoSource::setCameraSettings (const QJsonObject &json )
 {
   if (json.contains("area")) {
     int value = qBound(5, json.value("area").toInt(), 200);
@@ -118,15 +118,6 @@ void VideoSource::setCameraSettings (QJsonObject json )
     m_settings["smooth"] = value;
     m_smoothCount = value;
   }
-}
-
-
-QSize VideoSource::imageSize() const {
-  return m_currentImage.size();
-}
-
-QImage VideoSource::currentImage() const {
-  return m_currentImage;
 }
 
 void VideoSource::onRequestImage() {

@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-VideoSourceRaspberryCam::VideoSourceRaspberryCam(QString sourceIdentifier, QObject *parent) : VideoSource(sourceIdentifier, parent), m_camera(nullptr)
+VideoSourceRaspberryCam::VideoSourceRaspberryCam(const QString &sourceIdentifier, QObject *parent) : VideoSource(sourceIdentifier, parent), m_camera(nullptr)
 {
   // default settings
   m_settings["brightness"] = 50;
@@ -24,7 +24,7 @@ VideoSourceRaspberryCam::~VideoSourceRaspberryCam() {
   shutdownCamera();
 }
 
-void VideoSourceRaspberryCam::setCameraSettings ( QJsonObject json ) {
+void VideoSourceRaspberryCam::setCameraSettings ( const QJsonObject &json ) {
 
   VideoSource::setCameraSettings(json);
   if (json.contains("brightness")) {
@@ -83,9 +83,9 @@ void VideoSourceRaspberryCam::setCameraSettings ( QJsonObject json ) {
 
 void VideoSourceRaspberryCam::nextImage() {
 
-  bool ok = true;
+  bool ok;
   if (m_camera == nullptr) {
-    bool ok = initializeCamera();
+    ok = initializeCamera();
     if (!ok) {
       m_requestExit = true;
       return;

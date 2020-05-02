@@ -29,7 +29,7 @@ HueStream::HueStream( QObject *parent) : QObject(parent), m_dtls(nullptr), m_cli
 {
 }
 
-void HueStream::connectStream(QString username, QString clientkey, QString huebridge) {
+void HueStream::connectStream(const QString &username, const QString &clientkey, const QString &huebridge) {
   m_username = username;
   m_clientkey = clientkey;
   QSslConfiguration config = QSslConfiguration::defaultDtlsConfiguration();
@@ -52,8 +52,9 @@ void HueStream::connectStream(QString username, QString clientkey, QString huebr
   m_clientSocket->connectToHost(QHostAddress(huebridge), 2100);
 
   if (!m_dtls->doHandshake(m_clientSocket)) {
-    qDebug() << "error" << m_dtls->dtlsErrorString();
-    emit statusChanged(m_dtls->dtlsErrorString(), true);
+    QString err = m_dtls->dtlsErrorString();
+    qDebug() << "error" << err;
+    emit statusChanged(err, true);
   }
 }
 
