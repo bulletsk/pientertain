@@ -19,10 +19,15 @@ target_compile_definitions(raspicaminterface PRIVATE RASPICAMINTERFACE_LIBRARY)
 add_executable( testinterface testinterface.cpp)
 target_link_libraries( testinterface raspicaminterface )
 
-    INSTALL(TARGETS raspicaminterface
-	RUNTIME DESTINATION bin COMPONENT main
-	LIBRARY DESTINATION lib PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE COMPONENT main
-	ARCHIVE DESTINATION lib COMPONENT main)
+if (DEFINED CMAKE_SYSROOT)
+    include_directories("${CMAKE_SYSROOT}/usr/local/include")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_SYSROOT}/usr/local" CACHE PATH "install prefix" FORCE)
+endif()
+
+INSTALL(TARGETS raspicaminterface
+    RUNTIME DESTINATION bin COMPONENT main
+    LIBRARY DESTINATION lib PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE COMPONENT main
+    ARCHIVE DESTINATION lib COMPONENT main)
 
 #Installation of all header files	
 INSTALL(FILES raspicaminterface.h raspicaminterface_global.h

@@ -5,7 +5,9 @@
 #include <QDebug>
 #include <QJsonObject>
 
-HueAuthentication::HueAuthentication() : QObject(), m_appName("pientertain#valhalla"), m_huebridgeIp("192.168.2.101"), m_reply(nullptr), m_currentState(NoClientKey)
+HueAuthentication::HueAuthentication() : QObject(),
+  m_appName("pientertain#"+QHostInfo::localHostName()),
+  m_huebridgeIp("192.168.2.101"), m_reply(nullptr), m_currentState(NoClientKey)
 {
   readSettings();
   qDebug() << m_username;
