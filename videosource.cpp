@@ -28,8 +28,6 @@ VideoSource *VideoSource::createVideoSource(const QString &identifier, VideoSour
 
 VideoSource::VideoSource(const QString &sourceIdentifier, QObject *parent) : QThread(parent), m_identifier(sourceIdentifier), m_requestExit(false), m_areaSize(s_defaultAreaSize), m_smoothCount(s_defaultSmooth)
 {
-  m_settings["area"] = m_areaSize;
-  m_settings["smooth"] = m_smoothCount;
   readSettings();
 }
 
@@ -52,8 +50,15 @@ VideoSource::~VideoSource() {
 
 void VideoSource::readSettings()
 {
-  QVector<QPoint> corners;
   QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("processing");
+  m_areaSize = settings.value("area", s_defaultAreaSize).toInt();
+  m_smoothCount = settings.value("smooth", s_defaultSmooth).toInt();
+  m_settings["area"] = m_areaSize;
+  m_settings["smooth"] = m_smoothCount;
+  settings.endGroup();
+
+  QVector<QPoint> corners;
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
@@ -71,10 +76,15 @@ void VideoSource::readSettings()
 
 void VideoSource::writeSettings()
 {
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("processing");
+  settings.setValue("area", m_areaSize);
+  settings.setValue("smooth", m_smoothCount);
+  settings.endGroup();
+
   if (m_corners.size() != 4) {
     return;
   }
-  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     settings.setValue("point"+QString::number(i), m_corners[i-1]);
@@ -135,6 +145,9 @@ void VideoSource::onRequestImage() {
 }
 
 void VideoSource::run() {
+
+  emit cornersChanged(m_corners);
+  emit cameraSettingsChanged(m_settings);
 
   m_colors.resize(static_cast<int>(CornerLast));
 

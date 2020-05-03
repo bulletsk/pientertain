@@ -20,6 +20,7 @@ PiEntertain::PiEntertain()
   connect(&m_server, &RESTServer::cornersChanged, m_videoSource, &VideoSource::setCorners);
   connect(&m_server, &RESTServer::cameraSettingsChanged, m_videoSource, &VideoSource::setCameraSettings);
   connect(m_videoSource, &VideoSource::cameraSettingsChanged, &m_server, &RESTServer::onCameraSettingsChanged);
+  connect(m_videoSource, &VideoSource::cornersChanged, &m_server, &RESTServer::onCornersChanged);
 
   connect(&m_timer, &QTimer::timeout, this, &PiEntertain::onTimer);
 

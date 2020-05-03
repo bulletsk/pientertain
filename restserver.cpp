@@ -30,43 +30,19 @@ RESTServer::~RESTServer()
 
 void RESTServer::readSettings()
 {
-  m_corners.clear();
   QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
-  settings.beginGroup("servercorners");
-  for (int i=1;i<=4;i++) {
-    QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
-    if ( p.x() < 0) {
-      m_corners.clear();
-      break;
-    }
-    m_corners.append(p);
-  }
+  settings.beginGroup("server");
+  m_listenPort = settings.value("port", s_serverPort).toInt();
   settings.endGroup();
-  QString json = settings.value("camsettings", "").toString();
-  QJsonDocument doc = QJsonDocument::fromJson( json.toLatin1() );
-  m_cameraSettings = doc.object();
-  emit cameraSettingsChanged(m_cameraSettings);
 }
 
 void RESTServer::writeSettings()
 {
   QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
-  if (m_corners.size() == 4) {
-    settings.beginGroup("servercorners");
-    for (int i=1;i<=4;i++) {
-      settings.setValue("point"+QString::number(i), m_corners[i-1]);
-    }
-    settings.endGroup();
-  }
-  if (!m_cameraSettings.empty()) {
-    QJsonDocument doc(m_cameraSettings);
-    QString val = doc.toJson(QJsonDocument::Compact);
-    settings.setValue("camsettings", val);
-  }
+  settings.beginGroup("server");
+  settings.setValue("port", m_listenPort);
+  settings.endGroup();
 }
-
-
-
 
 void RESTServer::startServer()
 {
@@ -158,6 +134,11 @@ QJsonObject RESTServer::cameraSettings() const {
 void RESTServer::onCameraSettingsChanged( const QJsonObject &json )
 {
   m_cameraSettings = json;
+}
+
+void RESTServer::onCornersChanged( const QVector<QPoint> &corners )
+{
+  m_corners = corners;
 }
 
 

@@ -57,6 +57,7 @@ signals:
   void statusChanged(QString status, bool err);
   void latestImage( const QImage &image );
   void cameraSettingsChanged( QJsonObject jsonString );
+  void cornersChanged( const QVector<QPoint> &corners );
 
 public slots:
   void onRequestImage();

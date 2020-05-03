@@ -18,6 +18,9 @@ public:
 
   virtual void nextImage() override;
 
+  void readSettings();
+  void writeSettings();
+
 public slots:
   void setCameraSettings (const QJsonObject &json ) override;
 
