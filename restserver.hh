@@ -35,6 +35,7 @@ public slots:
   void onVideoStatus(const QString &status, bool err);
   void onVideoImage(const QImage &image);
   void onCameraSettingsChanged(const QJsonObject &json );
+  void onCornersChanged( const QVector<QPoint> &corners );
 
 protected slots:
   void onNewConnection();
@@ -50,7 +51,7 @@ protected:
 private:
   QTcpServer *m_serverSocket;
 
-  const int m_listenPort;
+  int m_listenPort;
 
   QString m_bridgeStatus;
   QString m_streamStatus;

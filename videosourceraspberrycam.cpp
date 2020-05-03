@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QSettings>
+#include <QCoreApplication>
 
 static const int s_defaultBrightness = 50;
 static const int s_defaultSaturation = 100;
@@ -26,18 +28,40 @@ static const int s_maxRangeValue = 100;
 
 VideoSourceRaspberryCam::VideoSourceRaspberryCam(const QString &sourceIdentifier, QObject *parent) : VideoSource(sourceIdentifier, parent), m_camera(nullptr)
 {
-  // default settings
-  m_settings["brightness"] = s_defaultBrightness;
-  m_settings["saturation"] = s_defaultSaturation;
-  m_settings["contrast"] = s_defaultContrast;
-  m_settings["whitebalance_r"] = s_defaultWb_r;
-  m_settings["whitebalance_b"] = s_defaultWb_b;
-  m_settings["iso"] = s_defaultIso;
-  m_settings["shutter"] = s_defaultShutter;
+  readSettings();
 }
 
 VideoSourceRaspberryCam::~VideoSourceRaspberryCam() {
+  writeSettings();
   shutdownCamera();
+}
+
+void VideoSourceRaspberryCam::readSettings()
+{
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("camera");
+  m_settings["brightness"] = settings.value("brightness", s_defaultBrightness).toInt();
+  m_settings["saturation"] = settings.value("saturation", s_defaultSaturation).toInt();
+  m_settings["contrast"] = settings.value("contrast", s_defaultContrast).toInt();
+  m_settings["whitebalance_r"] = settings.value("whitebalance_r", s_defaultWb_r).toInt();
+  m_settings["whitebalance_b"] = settings.value("whitebalance_b", s_defaultWb_b).toInt();
+  m_settings["iso"] = settings.value("iso", s_defaultIso).toInt();
+  m_settings["shutter"] = settings.value("shutter", s_defaultShutter).toInt();
+  settings.endGroup();
+}
+
+void VideoSourceRaspberryCam::writeSettings()
+{
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("camera");
+  settings.setValue("brightness", m_settings["brightness"].toInt());
+  settings.setValue("saturation", m_settings["saturation"].toInt());
+  settings.setValue("contrast", m_settings["contrast"].toInt());
+  settings.setValue("whitebalance_r", m_settings["whitebalance_r"].toInt());
+  settings.setValue("whitebalance_b", m_settings["whitebalance_b"].toInt());
+  settings.setValue("iso", m_settings["iso"].toInt());
+  settings.setValue("shutter", m_settings["shutter"].toInt());
+  settings.endGroup();
 }
 
 void VideoSourceRaspberryCam::setCameraSettings ( const QJsonObject &json ) {
