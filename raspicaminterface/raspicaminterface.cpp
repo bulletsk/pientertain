@@ -11,8 +11,11 @@ CameraHandle raspicam_create_camera()
   cam->setSaturation(0);
   cam->setISO(400);
   cam->setVideoStabilization(false);
-  cam->setExposureCompensation(0);
+  cam->setExposureCompensation(raspicam::RASPICAM_EXPOSURE_OFF);
   cam->setAWB(raspicam::RASPICAM_AWB_OFF);
+  cam->setFrameRate(60);
+  cam->setFormat( raspicam::RASPICAM_FORMAT_RGB );
+  cam->setShutterSpeed(40000);
   return (CameraHandle)cam;
 }
 bool raspicam_destroy_camera(CameraHandle handle)
