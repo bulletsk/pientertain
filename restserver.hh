@@ -16,9 +16,6 @@ public:
   void readSettings();
   void writeSettings();
 
-  QJsonObject cameraSettings() const;
-
-
 signals:
 
   void requestStart();

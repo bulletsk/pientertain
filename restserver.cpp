@@ -126,11 +126,6 @@ void RESTServer::onVideoImage(const QImage &image)
   image.save(&qio, "jpg", 10);
 }
 
-QJsonObject RESTServer::cameraSettings() const {
-  return m_cameraSettings;
-}
-
-
 void RESTServer::onCameraSettingsChanged( const QJsonObject &json )
 {
   m_cameraSettings = json;

@@ -24,8 +24,6 @@ PiEntertain::PiEntertain()
 
   connect(&m_timer, &QTimer::timeout, this, &PiEntertain::onTimer);
 
-  m_videoSource->setCameraSettings(m_server.cameraSettings());
-
   m_frameNumber = 0;
 }
 
