@@ -5,7 +5,9 @@ Hue Entertain from Raspberry Pi Camera
 Use a Raspberry Pi to film your TV or monitor and let it control your lights using the Hue Entertain API.
 
 Pientertain has a simple REST-like interface to control camera parameters and to define the area, where the display is located
-in the camera image. An example Android App to control pientertain can be found at <githublinkhere>.
+in the camera image. An example Android app to control pientertain can be found at https://github.com/bulletsk/pientertaincontrol.
+
+This project is for tinkering, proof-of-concept and learning. If you are looking for a complete solution to control your lights from different brands and types using various frame grabbers, check out Hyperion.ng here: https://github.com/hyperion-project/hyperion.ng.
 
 ### Installation
 Pientertain uses features of Qt 5.12 which doesnt come with raspbian yet unfortunately. To build my version of Qt 5.12 for the
@@ -23,7 +25,7 @@ So here is the step-by-step guide:
 - compile and install RaspiCam natively on the Pi
 - cross-compile RaspiCam, install to cross-compilation sysroot
 - compile and install raspicaminterface natively on the Pi
-- copy raspicaminterface to cross-compilation sysroot
+- cross-compile raspicaminterface, install to cross-compilation sysroot
 - cross-compile pientertain and deploy to Pi
 
 If somehow your cross-compiled RaspiCam works on the Pi, let me know how.
@@ -34,8 +36,9 @@ shutdown command, where it executes "sudo shutdown now" and shuts down the Pi. F
 to work without a password.
 
 ### Configuration and API
-All settings are saved using QSettings. The config file can usually be found at /home/username/.config/pientertain.conf.
-To control pientertain, use http requests to port 8999:
+All settings are saved using QSettings. The config file can usually be found at /home/username/.config/pientertain.conf or /home/username/.config/appkellner/pientertain.conf. Some settings like hue bridge ip, server port and image sensor width/height can only be set here.
+
+To control everything else, use http requests to the server port (default 8999):
 
 ```
 http://raspi.local:8999/status
@@ -82,9 +85,9 @@ use a PUT request with a JSON object contain any or all of the following key-val
     "brightness": 0 - 100,
     "saturation": -100 - 100,
     "contrast": -100 - 100,
-    "whitebalance_r": 0 - 8,
-    "whitebalance_b": 0 - 8,
-    "shutter": 0 - 3300000,   // in nanosecs
+    "whitebalance_r": 0 - 800,
+    "whitebalance_b": 0 - 800,
+    "shutter": 0 - 330000,    // in nanosecs
     "iso": 100 - 800,
     "area": 5 - 100,          // use image patches of area x area pixel 
                               // for color estimation
