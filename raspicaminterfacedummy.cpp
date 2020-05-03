@@ -60,8 +60,8 @@ void raspicam_set_contrast(CameraHandle, int c) {
 }
 
 // values 0 to 8
-void raspicam_set_whitebalance(CameraHandle, int r, int b) {
-  std::cout << "set wb " << r << b << std::endl;
+void raspicam_set_whitebalance(CameraHandle, float fr, float fb) {
+  std::cout << "set wb " << fr << fb << std::endl;
 }
 
 // value 100 to 800

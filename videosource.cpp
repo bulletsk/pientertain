@@ -53,7 +53,7 @@ VideoSource::~VideoSource() {
 void VideoSource::readSettings()
 {
   QVector<QPoint> corners;
-  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     QPoint p = settings.value("point"+QString::number(i), QPoint(-1,-1)).toPoint();
@@ -74,7 +74,7 @@ void VideoSource::writeSettings()
   if (m_corners.size() != 4) {
     return;
   }
-  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
   settings.beginGroup("corners");
   for (int i=1;i<=4;i++) {
     settings.setValue("point"+QString::number(i), m_corners[i-1]);

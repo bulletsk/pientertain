@@ -11,8 +11,8 @@
 static const int s_defaultBrightness = 50;
 static const int s_defaultSaturation = 100;
 static const int s_defaultContrast = 0;
-static const int s_defaultWb_r = 2;
-static const int s_defaultWb_b = 2;
+static const int s_defaultWb_r = 200;
+static const int s_defaultWb_b = 200;
 static const int s_defaultIso = 400;
 static const int s_defaultShutter = 40000;
 static const int s_imageWidth = 640;
@@ -20,7 +20,7 @@ static const int s_imageHeight = 480;
 static const int s_maxShutter = 330000;
 static const int s_minIso = 100;
 static const int s_maxIso = 800;
-static const int s_maxWb = 8;
+static const int s_maxWb = 800;
 static const int s_minRangeValue = -100;
 static const int s_maxRangeValue = 100;
 
@@ -73,7 +73,9 @@ void VideoSourceRaspberryCam::setCameraSettings ( const QJsonObject &json ) {
     m_settings["whitebalance_r"] = r;
     m_settings["whitebalance_b"] = b;
     if (m_camera) {
-      raspicam_set_whitebalance(m_camera, r, b);
+      float fr = static_cast<float>(r)/100.0f;
+      float fb = static_cast<float>(b)/100.0f;
+      raspicam_set_whitebalance(m_camera, fr, fb);
     }
   }
 

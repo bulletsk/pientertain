@@ -71,7 +71,7 @@ void raspicam_set_contrast(CameraHandle handle, int c) {
 }
 
 // values 0 to 8
-void raspicam_set_whitebalance(CameraHandle handle, int r, int b) {
+void raspicam_set_whitebalance(CameraHandle handle, float r, float b) {
   raspicam::RaspiCam *cam = (raspicam::RaspiCam *)handle;
   cam->setAWB_RB(r,b);
 }

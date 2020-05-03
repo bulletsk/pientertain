@@ -109,7 +109,7 @@ void HueAuthentication::onAuthenticationStateChange()
 
 void HueAuthentication::readSettings()
 {
-  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
   settings.beginGroup("auth");
   m_username = settings.value("user", "").toString();
   m_clientkey = settings.value("key", "").toString();
@@ -120,7 +120,7 @@ void HueAuthentication::readSettings()
 
 void HueAuthentication::writeSettings()
 {
-  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName());
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
   settings.beginGroup("auth");
   settings.setValue("user", m_username);
   settings.setValue("key", m_clientkey);

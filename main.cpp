@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]) {
   QCoreApplication::setOrganizationName("appkellner");
   QCoreApplication::setOrganizationDomain("www.appkellner.de");
-  QCoreApplication::setApplicationName("PiEntertain");
+  QCoreApplication::setApplicationName("pientertain");
 
   QCoreApplication app(argc, argv);
 

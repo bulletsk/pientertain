@@ -26,7 +26,7 @@ void raspicam_set_saturation(CameraHandle handle, int s);
 void raspicam_set_contrast(CameraHandle handle, int c);
 
 // values 0 to 8
-void raspicam_set_whitebalance(CameraHandle handle, int r, int b);
+void raspicam_set_whitebalance(CameraHandle handle, float r, float b);
 
 // value 100 to 800
 void raspicam_set_ISO(CameraHandle handle, int iso);
