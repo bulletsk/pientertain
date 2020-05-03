@@ -13,7 +13,7 @@ CameraHandle raspicam_create_camera()
   cam->setVideoStabilization(false);
   cam->setExposureCompensation(raspicam::RASPICAM_EXPOSURE_OFF);
   cam->setAWB(raspicam::RASPICAM_AWB_OFF);
-  cam->setFrameRate(60);
+//  cam->setFrameRate(60);
   cam->setFormat( raspicam::RASPICAM_FORMAT_RGB );
   cam->setShutterSpeed(40000);
   return (CameraHandle)cam;
