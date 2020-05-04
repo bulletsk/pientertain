@@ -18,6 +18,9 @@ public:
 
   virtual void nextImage() override;
 
+  virtual bool initialize() override;
+  virtual bool shutdown() override;
+
   void readSettings();
   void writeSettings();
 
@@ -25,13 +28,6 @@ public slots:
   void setCameraSettings (const QJsonObject &json ) override;
 
 protected:
-
-
-
-  bool initializeCamera();
-
-  bool shutdownCamera();
-
   CameraHandle m_camera;
 
 

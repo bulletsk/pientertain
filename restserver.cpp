@@ -83,7 +83,7 @@ void RESTServer::handleRequest()
   QString header(request.mid(0,headerlen));
   QByteArray content = request.mid(headerlen+2);
 
-  qDebug() << header;
+  //qDebug() << header;
 
   QStringList headers = header.split("\r\n");
   if (headers.empty()) {
@@ -104,7 +104,7 @@ void RESTServer::handleRequest()
   resource = reqString[1];
   version = reqString[2];
 
-  qDebug() << "X" << method << resource << version;
+  //qDebug() << "X" << method << resource << version;
 
   if (method == "GET") {
     handleGet(clientSocket, resource);

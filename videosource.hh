@@ -67,7 +67,9 @@ public slots:
 protected:
   void run() override;
 
+  virtual bool initialize() = 0;
   virtual void nextImage() = 0;
+  virtual bool shutdown() = 0;
   void calculateColors();
 
 

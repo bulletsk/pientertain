@@ -96,9 +96,15 @@ void HueStream::onDataAvailable()
   }
 }
 
+bool HueStream::isReadyToStream() const
+{
+  return (m_dtls == nullptr || !m_dtls->isConnectionEncrypted());
+}
+
+
 void HueStream::send(const LightPacket &lp)
 {
-  if (!m_dtls->isConnectionEncrypted()) {
+  if (!isReadyToStream()) {
     qDebug() << "encrypted connection not set up";
     return;
   }

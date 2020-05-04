@@ -16,6 +16,8 @@ public:
   void start();
   void startServer();
 
+  bool isSetup() const;
+
 public slots:
   void startStreaming();
   void stopStreaming();
@@ -23,6 +25,7 @@ public slots:
   void onStreamingActive(bool on);
   void onStreamEstablished(bool on);
   void onNewColors( const QVector<QColor> &colorVector );
+
 
 protected slots:
   void sendCurrentPacket();

@@ -155,6 +155,16 @@ void VideoSource::run() {
   QElapsedTimer frameRateTimer;
   int frameRateCounter = 0;
   frameRateTimer.start();
+
+  bool ok = initialize();
+
+  if (ok) {
+    emit statusChanged("initialized", false);
+  }
+  if (!ok) {
+    emit statusChanged("initialization failed", true);
+  }
+
   while (!m_requestExit) {
     m_imageLock.lock();
     nextImage();
@@ -172,6 +182,14 @@ void VideoSource::run() {
   }
 
   m_requestExit = false;
+  ok = shutdown();
+
+  if (ok) {
+    emit statusChanged("stopped", false);
+  } else {
+    emit statusChanged("shutdown failed", true);
+  }
+
 
 }
 

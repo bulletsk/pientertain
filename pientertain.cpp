@@ -2,7 +2,7 @@
 
 const static int s_sendPacketMinimumHz = 20;
 
-PiEntertain::PiEntertain()
+PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr)
 {
   QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
   m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Camera );
@@ -25,6 +25,12 @@ PiEntertain::PiEntertain()
   connect(m_videoSource, &VideoSource::cornersChanged, &m_server, &RESTServer::onCornersChanged);
 
   connect(&m_timer, &QTimer::timeout, this, &PiEntertain::sendCurrentPacket);
+  m_timer.setSingleShot(true);
+}
+
+bool PiEntertain::isSetup() const
+{
+  return m_auth.isSetup();
 }
 
 void PiEntertain::start() {
@@ -45,6 +51,7 @@ void PiEntertain::startStreaming() {
 }
 
 void PiEntertain::stopStreaming() {
+  m_videoSource->stop();
   m_timer.stop();
   m_stream.stop();
   m_auth.stopStreaming();
@@ -58,7 +65,7 @@ void PiEntertain::shutDown() {
 #else
   QProcess::execute(shutdownCommand);
 #endif
-  QCoreApplication::exit(0);
+  QTimer::singleShot(5000, []() { QCoreApplication::exit(0); });
 }
 
 void PiEntertain::onStreamingActive(bool on)
@@ -78,12 +85,11 @@ void PiEntertain::onStreamEstablished(bool on)
   if (on) {
     m_timer.start(1000 / s_sendPacketMinimumHz);
     m_videoSource->start();
-  } else {
-    m_videoSource->stop();
   }
 }
 
 void PiEntertain::sendCurrentPacket() {
+  if (!m_stream.isReadyToStream()) return;
   const LightGroup group = m_auth.lightGroup(0);
   const QVector<Light> lights = group.lights();
 

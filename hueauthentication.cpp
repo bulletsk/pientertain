@@ -5,16 +5,22 @@
 #include <QDebug>
 #include <QJsonObject>
 
+const static QString s_defaultHueIp = "put bridge IP here";
+
 HueAuthentication::HueAuthentication() : QObject(),
-  m_appName("pientertain#"+QHostInfo::localHostName()),
-  m_huebridgeIp("192.168.2.101"), m_reply(nullptr), m_currentState(NoClientKey)
+  m_appName("pientertain#"+QHostInfo::localHostName()), m_reply(nullptr), m_currentState(NoClientKey)
 {
   readSettings();
-  qDebug() << m_username;
 }
 HueAuthentication::~HueAuthentication()
 {
   writeSettings();
+}
+
+bool HueAuthentication::isSetup() const {
+  bool isIpv4Adress;
+  QHostAddress(m_huebridgeIp).toIPv4Address(&isIpv4Adress);
+  return isIpv4Adress;
 }
 
 QString HueAuthentication::userName() const {
@@ -29,6 +35,9 @@ QString HueAuthentication::hueBridgeIp() const {
 
 LightGroup HueAuthentication::lightGroup(int number) const
 {
+  if (number<0 || number >= m_groups.size()) {
+    return LightGroup();
+  }
   return m_groups[number];
 }
 
@@ -90,6 +99,7 @@ void HueAuthentication::onAuthenticationStateChange()
   case DisableStreaming:
   {
     bool enable = m_currentState == EnableStreaming;
+    qDebug() << "enable streaming " << enable;
     QJsonDocument doc;
     QJsonObject stream;
     QJsonObject active;
@@ -115,7 +125,7 @@ void HueAuthentication::readSettings()
   settings.beginGroup("auth");
   m_username = settings.value("user", "").toString();
   m_clientkey = settings.value("key", "").toString();
-  m_huebridgeIp = settings.value("bridgeIp", m_huebridgeIp).toString();
+  m_huebridgeIp = settings.value("bridgeIp", s_defaultHueIp).toString();
   m_appName = settings.value("appName", m_appName).toString();
   settings.endGroup();
 }
@@ -144,8 +154,7 @@ void HueAuthentication::onRequestFinished()
   bool error = m_reply->error();
 
   if (error) {
-    qDebug() << "error";
-    qDebug() << m_response;
+    qDebug() << "error" << m_response;
     emit statusChanged(m_response, true);
     return;
   }
@@ -206,15 +215,14 @@ void HueAuthentication::onRequestFinished()
     for (const QJsonValue &ref : arr) {
       const QJsonObject obj = ref.toObject();
       if (obj.contains("error")) {
-        qDebug() << obj["error"].toObject()["description"].toString();
+        const QString err = obj["error"].toObject()["description"].toString();
+        qDebug() << err;
+        emit statusChanged(err, true);
       } else if (obj.contains("success")) {
-        qDebug() << doc.toJson(QJsonDocument::Compact);
         if (m_currentState == EnableStreaming) {
-          m_currentState = DisableStreaming;
           emit streamingActive(true);
           emit statusChanged("stream enabled", false);
         } else {
-          // go to exit
           emit streamingActive(false);
           emit statusChanged("stream disabled", false);
         }

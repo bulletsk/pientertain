@@ -21,9 +21,12 @@ public:
   };
 
   void startAuthentication();
+  void stopStreaming();
 
   HueAuthentication();
   virtual ~HueAuthentication();
+
+  bool isSetup() const;
 
   QString userName() const;
   QString clientKey() const;
@@ -38,11 +41,8 @@ signals:
   void streamingActive(bool on);
   void statusChanged(QString err, bool isError);
 
-public slots:
-  void onAuthenticationStateChange();
-  void stopStreaming();
-
 protected slots:
+  void onAuthenticationStateChange();
 
   void onDataAvailable();
   void onRequestFinished();

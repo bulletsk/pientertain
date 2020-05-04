@@ -11,6 +11,8 @@ public:
   virtual ~VideoSourceImage() override = default;
 protected:
   virtual void nextImage() override;
+  virtual bool initialize() override;
+  virtual bool shutdown() override;
 
 };
 

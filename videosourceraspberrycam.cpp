@@ -33,7 +33,7 @@ VideoSourceRaspberryCam::VideoSourceRaspberryCam(const QString &sourceIdentifier
 
 VideoSourceRaspberryCam::~VideoSourceRaspberryCam() {
   writeSettings();
-  shutdownCamera();
+  shutdown();
 }
 
 void VideoSourceRaspberryCam::readSettings()
@@ -129,16 +129,7 @@ void VideoSourceRaspberryCam::setCameraSettings ( const QJsonObject &json ) {
 
 void VideoSourceRaspberryCam::nextImage() {
 
-  bool ok;
-  if (m_camera == nullptr) {
-    ok = initializeCamera();
-    if (!ok) {
-      m_requestExit = true;
-      return;
-    }
-  }
-
-  ok = raspicam_grab(m_camera);
+  bool ok = raspicam_grab(m_camera);
   if (!ok) {
     emit statusChanged("grab image error", true);
     m_requestExit = true;
@@ -148,7 +139,7 @@ void VideoSourceRaspberryCam::nextImage() {
   raspicam_retrieve(m_camera, m_currentImage.bits() );
 }
 
-bool VideoSourceRaspberryCam::initializeCamera()
+bool VideoSourceRaspberryCam::initialize()
 {
   m_camera = raspicam_create_camera();
 
@@ -171,7 +162,7 @@ bool VideoSourceRaspberryCam::initializeCamera()
   return true;
 }
 
-bool VideoSourceRaspberryCam::shutdownCamera()
+bool VideoSourceRaspberryCam::shutdown()
 {
   if (m_camera == nullptr) return true;
   raspicam_release(m_camera);

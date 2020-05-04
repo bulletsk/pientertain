@@ -17,6 +17,8 @@ public:
   void send(const LightPacket &lp);
   void stop();
 
+  bool isReadyToStream() const;
+
 signals:
   void streamEstablished(bool on);
   void timeoutError();
