@@ -1,9 +1,6 @@
 #include "light.hh"
 #include <QDebug>
 
-static bool isInside( const QVector2D &red, const QVector2D &green, const QVector2D &blue, const QVector2D & x );
-static float closestPointOnLine( const QVector2D &p1, const QVector2D &p2, const QVector2D &x, QVector2D &closest);
-
 Light::Light(int id) : m_id(id), m_pos(0.0f,0.0f,0.0f)
 {
   m_gamut.red = { 1.0f,0.0f };

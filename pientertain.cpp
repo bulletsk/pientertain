@@ -2,12 +2,16 @@
 
 const static int s_sendPacketMinimumHz = 20;
 const static bool s_defaultUseRGB = false;
-const static bool s_defaultUseGammaCompensation = false;
+const static bool s_defaultUseGammaCompensation = true;
 
 PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr), m_currentPacket(false,false), m_useRGB(false), m_useGammaCompensation(false)
 {
+#if WIN32
   QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
   m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
+#else
+  m_videoSource = VideoSource::createVideoSource( "", VideoSource::Camera );
+#endif
   connect(m_videoSource, &VideoSource::newColors, this, &PiEntertain::onNewColors, Qt::QueuedConnection);
   connect(m_videoSource, &VideoSource::statusChanged, &m_server, &RESTServer::onVideoStatus);
   connect(m_videoSource, &VideoSource::latestImage, &m_server, &RESTServer::onVideoImage);
@@ -136,14 +140,6 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
 
   if (m_prevColors.size() < lights.size()) {
     m_prevColors.resize(lights.size());
-  }
-
-  bool oldrgb = m_useRGB;
-  bool olduse = m_useGammaCompensation;
-  m_useRGB = (m_frameNumber / 100 % 3 == 1 || m_frameNumber / 100 % 3 == 2);
-  m_useGammaCompensation = (m_frameNumber / 100 % 3 == 2);
-  if (oldrgb != m_useRGB || m_useGammaCompensation != olduse) {
-    qDebug() << "usergb" << m_useRGB << "gaama" << m_useGammaCompensation;
   }
 
   m_currentPacket = LightPacket(m_useRGB, m_useGammaCompensation);
