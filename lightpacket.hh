@@ -24,7 +24,7 @@ public:
     uint16_t b;
   };
 
-  LightPacket();
+  LightPacket(bool useRGB);
 
   void setSequenceNumber(int num);
 

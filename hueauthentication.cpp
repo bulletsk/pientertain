@@ -95,6 +95,14 @@ void HueAuthentication::onAuthenticationStateChange()
     connect(m_reply, &QIODevice::readyRead, this, &HueAuthentication::onDataAvailable);
   }
     break;
+  case FillLightDetails:
+  {
+    QNetworkRequest request( QUrl(surl+"/api/"+m_username+"/lights") );
+    m_reply = m_networkmanager.get(request);
+    connect(m_reply, &QNetworkReply::finished, this, &HueAuthentication::onRequestFinished);
+    connect(m_reply, &QIODevice::readyRead, this, &HueAuthentication::onDataAvailable);
+  }
+    break;
   case EnableStreaming:
   case DisableStreaming:
   {
@@ -201,11 +209,21 @@ void HueAuthentication::onRequestFinished()
       lg.dump();
     }
     if (!m_groups.empty()) {
-      m_currentState = EnableStreaming;
+      m_currentState = FillLightDetails;
       QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
     } else {
       emit statusChanged("no entertainment group", true);
     }
+  }
+    break;
+  case FillLightDetails:
+  {
+    qDebug() << doc.toJson();
+    for (LightGroup &group : m_groups) {
+      group.setColorGamutsFromJSON( doc.object() );
+    }
+    m_currentState = EnableStreaming;
+    QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
   }
     break;
   case EnableStreaming:

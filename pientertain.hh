@@ -13,6 +13,9 @@ public:
   PiEntertain();
   virtual ~PiEntertain();
 
+  void readSettings();
+  void writeSettings();
+
   void start();
   void startServer();
 
@@ -45,6 +48,9 @@ private:
   LightPacket m_currentPacket;
 
   QVector< QList< QVector3D > > m_prevColors;
+
+  bool m_useRGB;
+  bool m_useGammaCompensation;
 
 };
 

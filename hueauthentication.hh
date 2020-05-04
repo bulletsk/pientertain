@@ -15,6 +15,7 @@ public:
 
     NoClientKey=0,
     FindEntertainmentGroup,
+    FillLightDetails,
     EnableStreaming,
     DisableStreaming,
     LastState

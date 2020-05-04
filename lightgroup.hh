@@ -3,12 +3,27 @@
 
 #include <QJsonObject>
 #include <QVector3D>
+#include <QVector2D>
 #include <QVector>
 #include <QList>
 
-struct Light {
+class Light {
+public:
+  Light(int _id) : id(_id), pos(0.0f,0.0f,0.0f),
+    m_gamut_red(1.0f,0.0f),
+    m_gamut_green(0.0f,1.0f),
+    m_gamut_blue(0.0f,0.0f) {}
+
+  void setColorGamutFromJSON( const QJsonArray &arr );
+  QVector3D convertToxyY(QVector3D rgb, bool withGammaCompensation) const;
+
+public:
   int id;
   QVector3D pos;
+protected:
+  QVector2D m_gamut_red;
+  QVector2D m_gamut_green;
+  QVector2D m_gamut_blue;
 };
 
 class LightGroup : public QJsonObject
@@ -33,10 +48,14 @@ public:
   QString entertainmentClass() const;
 
   QVector<Light> lights() const;
+  void setColorGamutsFromJSON( const QJsonObject &obj );
 
   void dump() const;
 
 protected:
+
+  QJsonValue getPath( const QJsonObject &obj, const QStringList &path );
+
   int m_id;
   QVector<Light> m_lights;
 };

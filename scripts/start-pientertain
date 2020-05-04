@@ -6,7 +6,7 @@ export QT_PLUGIN_PATH=/usr/local/qt-5.12.8/plugins
 pushd . > /dev/null
 
 cd /usr/local/bin
-/sbin/runuser bravo -s ./pientertain > /dev/null &
+/sbin/runuser bravo -s ./pientertain &
 
 popd > /dev/null
 

@@ -1,8 +1,10 @@
 #include "pientertain.hh"
 
 const static int s_sendPacketMinimumHz = 20;
+const static bool s_defaultUseRGB = false;
+const static bool s_defaultUseGammaCompensation = false;
 
-PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr)
+PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr), m_currentPacket(false), m_useRGB(false), m_useGammaCompensation(false)
 {
   QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
   m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Camera );
@@ -26,7 +28,28 @@ PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr)
 
   connect(&m_timer, &QTimer::timeout, this, &PiEntertain::sendCurrentPacket);
   m_timer.setSingleShot(true);
+
+  readSettings();
 }
+
+void PiEntertain::readSettings()
+{
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("advanced");
+  m_useRGB = settings.value("useRGB", s_defaultUseRGB).toBool();
+  m_useGammaCompensation = settings.value("useGammaCompensation", s_defaultUseGammaCompensation).toBool();
+  settings.endGroup();
+}
+
+void PiEntertain::writeSettings()
+{
+  QSettings settings(QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
+  settings.beginGroup("advanced");
+  settings.setValue("useRGB", m_useRGB);
+  settings.setValue("useGammaCompensation", m_useGammaCompensation);
+  settings.endGroup();
+}
+
 
 bool PiEntertain::isSetup() const
 {
@@ -43,6 +66,7 @@ void PiEntertain::startServer() {
 
 PiEntertain::~PiEntertain()
 {
+  writeSettings();
   delete m_videoSource;
 }
 
@@ -114,7 +138,7 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
     m_prevColors.resize(lights.size());
   }
 
-  m_currentPacket = LightPacket();
+  m_currentPacket = LightPacket(m_useRGB);
 
   for (int i=0;i<lights.size();i++) {
     Light light = lights[i];
@@ -131,10 +155,18 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
       mixedColor = std::accumulate(m_prevColors[i].begin(), m_prevColors[i].end(), QVector3D(0.0f,0.0f,0.0f));
       mixedColor /= static_cast<float>(m_prevColors[i].size());
     }
-    m_currentPacket.addLightData(light.id,
+    if (m_useRGB) {
+      m_currentPacket.addLightData(light.id,
                                  static_cast<uint16_t>(mixedColor.x()*65535.0f),
                                  static_cast<uint16_t>(mixedColor.y()*65535.0f),
                                  static_cast<uint16_t>(mixedColor.z()*65535.0f));
+    } else {
+      QVector3D xyY = light.convertToxyY(mixedColor, m_useGammaCompensation);
+      m_currentPacket.addLightData(light.id,
+                                 static_cast<uint16_t>(xyY.x()*65535.0f),
+                                 static_cast<uint16_t>(xyY.y()*65535.0f),
+                                 static_cast<uint16_t>(xyY.z()*65535.0f));
+    }
   }
   sendCurrentPacket();
 }

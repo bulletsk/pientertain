@@ -7,14 +7,19 @@ static const char *s_protocol = "HueStream";
 static const int s_protocolLength = 9;
 static const int s_maxNumberofLights = 10;
 
-LightPacket::LightPacket() : QByteArray(sizeof(PacketHeader), 0)
+LightPacket::LightPacket(bool useRGB) : QByteArray(sizeof(PacketHeader), 0)
 {
   memcpy(data(), s_protocol, s_protocolLength);
   PacketHeader *header = (PacketHeader*)(data());
 
   header->versionMajor = 0x01;
 //  header->versionMinor = 0x00;
-//  header->colorSpace = 0x00; // 0x01 xy brightness, 0x00 rgb
+  if (!useRGB) {
+    header->colorSpace = 0x01;
+  }
+//  else {
+//    //  header->colorSpace = 0x00; // 0x01 xy brightness, 0x00 rgb
+//  }
 }
 
 void LightPacket::setSequenceNumber(int num) {
