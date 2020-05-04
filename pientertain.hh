@@ -25,7 +25,7 @@ public slots:
   void onNewColors( const QVector<QColor> &colorVector );
 
 protected slots:
-  void onTimer();
+  void sendCurrentPacket();
 
 private:
   QVector3D mixColorForPosition( const QVector3D &pos, const QVector<QColor> &colorVector );
@@ -42,6 +42,7 @@ private:
   LightPacket m_currentPacket;
 
   QVector< QList< QVector3D > > m_prevColors;
+
 };
 
 

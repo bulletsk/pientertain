@@ -1,5 +1,7 @@
 #include "pientertain.hh"
 
+const static int s_sendPacketMinimumHz = 20;
+
 PiEntertain::PiEntertain()
 {
   QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
@@ -22,9 +24,7 @@ PiEntertain::PiEntertain()
   connect(m_videoSource, &VideoSource::cameraSettingsChanged, &m_server, &RESTServer::onCameraSettingsChanged);
   connect(m_videoSource, &VideoSource::cornersChanged, &m_server, &RESTServer::onCornersChanged);
 
-  connect(&m_timer, &QTimer::timeout, this, &PiEntertain::onTimer);
-
-  m_frameNumber = 0;
+  connect(&m_timer, &QTimer::timeout, this, &PiEntertain::sendCurrentPacket);
 }
 
 void PiEntertain::start() {
@@ -76,14 +76,14 @@ void PiEntertain::onStreamingActive(bool on)
 void PiEntertain::onStreamEstablished(bool on)
 {
   if (on) {
-    m_timer.start(10);
+    m_timer.start(1000 / s_sendPacketMinimumHz);
     m_videoSource->start();
   } else {
     m_videoSource->stop();
   }
 }
 
-void PiEntertain::onTimer() {
+void PiEntertain::sendCurrentPacket() {
   const LightGroup group = m_auth.lightGroup(0);
   const QVector<Light> lights = group.lights();
 
@@ -96,6 +96,7 @@ void PiEntertain::onTimer() {
   m_currentPacket.setSequenceNumber(m_frameNumber);
   m_stream.send(m_currentPacket);
   m_frameNumber++;
+  m_timer.start(1000 / s_sendPacketMinimumHz);
 }
 
 void PiEntertain::onNewColors( const QVector<QColor> &colorVector )

@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QCoreApplication>
+#include <QElapsedTimer>
 
 static const int s_minArea = 5;
 static const int s_maxArea = 200;
@@ -151,6 +152,9 @@ void VideoSource::run() {
 
   m_colors.resize(static_cast<int>(CornerLast));
 
+  QElapsedTimer frameRateTimer;
+  int frameRateCounter = 0;
+  frameRateTimer.start();
   while (!m_requestExit) {
     m_imageLock.lock();
     nextImage();
@@ -158,6 +162,13 @@ void VideoSource::run() {
     calculateColors();
     emit newColors(m_colors);
 
+    frameRateCounter++;
+    if (frameRateCounter==100) {
+      quint64 msecs = frameRateTimer.restart();
+      QString fpsMessage = QString::number( (1000.0f / (msecs/100.0f)), 'g', 4) + " fps";
+      frameRateCounter = 0;
+      emit statusChanged( fpsMessage, false );
+    }
   }
 
   m_requestExit = false;
