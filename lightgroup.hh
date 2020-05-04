@@ -9,7 +9,7 @@
 
 class Light {
 public:
-  Light(int _id) : id(_id), pos(0.0f,0.0f,0.0f),
+  Light(int _id=-1) : id(_id), pos(0.0f,0.0f,0.0f),
     m_gamut_red(1.0f,0.0f),
     m_gamut_green(0.0f,1.0f),
     m_gamut_blue(0.0f,0.0f) {}

@@ -109,7 +109,7 @@ LightGroup::LightGroup(int id, const QJsonObject &obj) : QJsonObject(obj), m_id(
     const QJsonArray arr = value("lights").toArray();
     for (const QJsonValue &ref : arr) {
       const QString sid = ref.toString();
-      m_lights.append(sid.toInt());
+      m_lights.append(Light(sid.toInt()));
     }
   }
   if (contains("locations")) {
@@ -204,6 +204,7 @@ void LightGroup::dump() const
   qDebug() << "lights";
   for (const Light &l : m_lights) {
     qDebug() << l.id << l.pos;
+    l.dump();
   }
 }
 
