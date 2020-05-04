@@ -70,7 +70,7 @@ bool ColorConversion::isInside( const Light::Gamut &gamut, const QVector2D & x )
 float ColorConversion::closestPointOnLine( const QVector2D &p1, const QVector2D &p2, const QVector2D &x, QVector2D &closest) {
 
   const QVector2D unitDir = (p2-p1).normalized();
-  const float dot = qBound(0.0f, QVector2D::dotProduct( x-p1, unitDir ), 1.0f );
+  const float dot = qBound(0.0f, QVector2D::dotProduct( x-p1, unitDir ), (p2-p1).length() );
   closest = p1 + dot * unitDir;
   return (x-closest).length();
 }
