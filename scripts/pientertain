@@ -19,7 +19,7 @@ case "$1" in
         /usr/local/bin/stop-pientertain
         ;;
     *)
-        echo "usase /etc/init.d/pientertain {start|stop}"
+        echo "usage /etc/init.d/pientertain {start|stop}"
         exit 1
         ;;
 esac
