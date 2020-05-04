@@ -1,9 +1,7 @@
-#include <QCoreApplication>
-#include <iostream>
-
 #include "pientertain.hh"
 
-#include "lightgroup.hh"
+#include <QCoreApplication>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
 
