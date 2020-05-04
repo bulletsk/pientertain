@@ -52,11 +52,11 @@ void LightPacket::addLightData(const Light &light)
   QByteArray lightdata(s_lightdataSize,Qt::Uninitialized);
   char *data = lightdata.data();
 
-  char type = 0; // type light
-  unsigned short nId = qToBigEndian(id);
-  unsigned short nR = qToBigEndian(r);
-  unsigned short nG = qToBigEndian(g);
-  unsigned short nB = qToBigEndian(b);
+  const uint8_t type = 0; // type light
+  const uint16_t nId = qToBigEndian(id);
+  const uint16_t nR = qToBigEndian(r);
+  const uint16_t nG = qToBigEndian(g);
+  const uint16_t nB = qToBigEndian(b);
 
   memcpy(data, &type, 1);
   memcpy(data+1, (const char*)&nId, 2);
