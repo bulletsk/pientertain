@@ -2,6 +2,7 @@
 #define LIGHTPACKET_HH
 
 #include <QByteArray>
+#include "light.hh"
 
 class LightPacket : public QByteArray
 {
@@ -24,15 +25,18 @@ public:
     uint16_t b;
   };
 
-  LightPacket(bool useRGB);
+  LightPacket(bool useRGB, bool useGammaCompensation);
 
   void setSequenceNumber(int num);
 
-//  void addLightData(unsigned short id, unsigned short x, unsigned short y, unsigned short brightness);
-  void addLightData(const uint16_t id, const uint16_t r, const uint16_t g, const uint16_t b);
+  void addLightData(const Light &light);
 
   int numLights() const;
   int maxLights() const;
+
+private:
+  bool m_sendRGB;
+  bool m_useGammaCompensation;
 };
 
 #endif // LIGHTPACKET_HH

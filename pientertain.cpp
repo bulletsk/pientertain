@@ -4,10 +4,10 @@ const static int s_sendPacketMinimumHz = 20;
 const static bool s_defaultUseRGB = false;
 const static bool s_defaultUseGammaCompensation = false;
 
-PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr), m_currentPacket(false), m_useRGB(false), m_useGammaCompensation(false)
+PiEntertain::PiEntertain() : m_frameNumber(0), m_videoSource(nullptr), m_currentPacket(false,false), m_useRGB(false), m_useGammaCompensation(false)
 {
   QString imgName = QCoreApplication::applicationDirPath() + "/colortestimage.png";
-  m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Camera );
+  m_videoSource = VideoSource::createVideoSource( imgName, VideoSource::Image );
   connect(m_videoSource, &VideoSource::newColors, this, &PiEntertain::onNewColors, Qt::QueuedConnection);
   connect(m_videoSource, &VideoSource::statusChanged, &m_server, &RESTServer::onVideoStatus);
   connect(m_videoSource, &VideoSource::latestImage, &m_server, &RESTServer::onVideoImage);
@@ -120,7 +120,7 @@ void PiEntertain::sendCurrentPacket() {
   if (m_currentPacket.numLights()==0) {
     // send default packet
     for (const Light &light : lights) {
-      m_currentPacket.addLightData(light.id, 0,0,0);
+      m_currentPacket.addLightData(light);
     }
   }
   m_currentPacket.setSequenceNumber(m_frameNumber);
@@ -138,11 +138,19 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
     m_prevColors.resize(lights.size());
   }
 
-  m_currentPacket = LightPacket(m_useRGB);
+  bool oldrgb = m_useRGB;
+  bool olduse = m_useGammaCompensation;
+  m_useRGB = (m_frameNumber / 100 % 3 == 1 || m_frameNumber / 100 % 3 == 2);
+  m_useGammaCompensation = (m_frameNumber / 100 % 3 == 2);
+  if (oldrgb != m_useRGB || m_useGammaCompensation != olduse) {
+    qDebug() << "usergb" << m_useRGB << "gaama" << m_useGammaCompensation;
+  }
+
+  m_currentPacket = LightPacket(m_useRGB, m_useGammaCompensation);
 
   for (int i=0;i<lights.size();i++) {
     Light light = lights[i];
-    QVector3D mixedColor = mixColorForPosition( light.pos, colorVector );
+    QVector3D mixedColor = mixColorForPosition( light.pos(), colorVector );
 
     int smooth = m_videoSource->smooth();
     if (smooth > 0) {
@@ -155,18 +163,8 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
       mixedColor = std::accumulate(m_prevColors[i].begin(), m_prevColors[i].end(), QVector3D(0.0f,0.0f,0.0f));
       mixedColor /= static_cast<float>(m_prevColors[i].size());
     }
-    if (m_useRGB) {
-      m_currentPacket.addLightData(light.id,
-                                 static_cast<uint16_t>(mixedColor.x()*65535.0f),
-                                 static_cast<uint16_t>(mixedColor.y()*65535.0f),
-                                 static_cast<uint16_t>(mixedColor.z()*65535.0f));
-    } else {
-      QVector3D xyY = light.convertToxyY(mixedColor, m_useGammaCompensation);
-      m_currentPacket.addLightData(light.id,
-                                 static_cast<uint16_t>(xyY.x()*65535.0f),
-                                 static_cast<uint16_t>(xyY.y()*65535.0f),
-                                 static_cast<uint16_t>(xyY.z()*65535.0f));
-    }
+    light.setColorRGB(mixedColor);
+    m_currentPacket.addLightData(light);
   }
   sendCurrentPacket();
 }

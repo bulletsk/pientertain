@@ -25,6 +25,10 @@ find_package(Qt5 COMPONENTS Core Gui Network REQUIRED)
 add_executable(pientertain main.cpp
     hueauthentication.cpp
     hueauthentication.hh
+    light.cpp
+    light.hh
+    colorconversion.cpp
+    colorconversion.hh
     lightgroup.cpp
     lightgroup.hh
     huestream.cpp

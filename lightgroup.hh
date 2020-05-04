@@ -7,26 +7,7 @@
 #include <QVector>
 #include <QList>
 
-class Light {
-public:
-  Light(int _id=-1) : id(_id), pos(0.0f,0.0f,0.0f),
-    m_gamut_red(1.0f,0.0f),
-    m_gamut_green(0.0f,1.0f),
-    m_gamut_blue(0.0f,0.0f) {}
-
-  void setColorGamutFromJSON( const QJsonArray &arr );
-  QVector3D convertToxyY(QVector3D rgb, bool withGammaCompensation) const;
-
-  void dump() const;
-
-public:
-  int id;
-  QVector3D pos;
-protected:
-  QVector2D m_gamut_red;
-  QVector2D m_gamut_green;
-  QVector2D m_gamut_blue;
-};
+#include "light.hh"
 
 class LightGroup : public QJsonObject
 {
