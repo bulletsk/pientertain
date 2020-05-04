@@ -1,0 +1,12 @@
+#!/bin/bash
+echo "start"
+export LD_LIBRARY_PATH=/usr/local/qt-5.12.8/lib:/usr/local/lib
+export QT_PLUGIN_PATH=/usr/local/qt-5.12.8/plugins
+
+pushd . > /dev/null
+
+cd /usr/local/bin
+/sbin/runuser bravo -s ./pientertain > /dev/null &
+
+popd > /dev/null
+

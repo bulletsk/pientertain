@@ -14,7 +14,7 @@ set(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if (DEFINED CMAKE_SYSROOT)
-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -Wl,-rpath-link,${CMAKE_SYSROOT}/opt/vc/lib")
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -Wl,-rpath-link,${CMAKE_SYSROOT}/opt/vc/lib -march=armv7-a -marm -mthumb-interwork -mfpu=neon-vfpv4 -mtune=cortex-a7 -mabi=aapcs-linux")
     find_package(raspicaminterface REQUIRED)
 else()
     add_library(raspicaminterface raspicaminterfacedummy.cpp raspicaminterfacedummy.h)
