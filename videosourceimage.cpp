@@ -1,7 +1,7 @@
 #include "videosourceimage.hh"
 #include <QDebug>
 
-static const int s_nextImageSleep = 2000;
+static const int s_nextImageSleep = 40;
 
 VideoSourceImage::VideoSourceImage(const QString &sourceIdentifier, QObject *parent)
   : VideoSource(sourceIdentifier, parent)

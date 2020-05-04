@@ -3,9 +3,10 @@
 
 #include "pientertain.hh"
 
-#include <QVector2D>
+#include "lightgroup.hh"
 
 int main(int argc, char *argv[]) {
+
   QCoreApplication::setOrganizationName("appkellner");
   QCoreApplication::setOrganizationDomain("www.appkellner.de");
   QCoreApplication::setApplicationName("pientertain");

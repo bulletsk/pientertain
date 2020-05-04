@@ -81,8 +81,10 @@ void HueStream::onDataAvailable()
   qint64 bytes = m_clientSocket->readDatagram(dgram.data(), dgram.size());
   dgram.resize(bytes);
   if (m_dtls->isConnectionEncrypted()) {
+    QByteArray data = m_dtls->decryptDatagram(m_clientSocket, dgram);
     qDebug() << "is encrypted";
     qDebug() << "todo do something with this";
+    qDebug() << "data:" << data;
   } else {
     if (!m_dtls->doHandshake(m_clientSocket, dgram)) {
       qDebug() << "error in continue handshake";

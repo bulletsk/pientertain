@@ -17,6 +17,8 @@ public:
   void setColorGamutFromJSON( const QJsonArray &arr );
   QVector3D convertToxyY(QVector3D rgb, bool withGammaCompensation) const;
 
+  void dump() const;
+
 public:
   int id;
   QVector3D pos;

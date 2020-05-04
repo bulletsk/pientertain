@@ -95,6 +95,11 @@ QVector3D Light::convertToxyY(QVector3D rgb, bool withGammaCompensation) const
   return QVector3D( bestPoint.x(), bestPoint.y(), Y );
 }
 
+void Light::dump() const
+{
+  qDebug() << "gamut" << m_gamut_red << m_gamut_green << m_gamut_blue;
+}
+
 
 LightGroup::LightGroup() : m_id(-1){}
 

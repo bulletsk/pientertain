@@ -205,9 +205,6 @@ void HueAuthentication::onRequestFinished()
         m_groups.append( lg );
       }
     }
-    for (const LightGroup &lg : qAsConst(m_groups)) {
-      lg.dump();
-    }
     if (!m_groups.empty()) {
       m_currentState = FillLightDetails;
       QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
@@ -218,9 +215,11 @@ void HueAuthentication::onRequestFinished()
     break;
   case FillLightDetails:
   {
-    qDebug() << doc.toJson();
     for (LightGroup &group : m_groups) {
       group.setColorGamutsFromJSON( doc.object() );
+    }
+    for (const LightGroup &lg : qAsConst(m_groups)) {
+      lg.dump();
     }
     m_currentState = EnableStreaming;
     QTimer::singleShot(500, this, &HueAuthentication::onAuthenticationStateChange);
