@@ -52,7 +52,7 @@ void PiEntertain::stopStreaming() {
 
 void PiEntertain::shutDown() {
   stopStreaming();
-  QString shutdownCommand = "sudo /sbin/shutdown now";
+  QString shutdownCommand = "sudo /sbin/shutdown";
 #ifdef WIN32
   qDebug() << shutdownCommand;
 #else

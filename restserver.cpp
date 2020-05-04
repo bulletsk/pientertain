@@ -55,7 +55,6 @@ void RESTServer::stopServer()
   if (m_serverSocket->isListening()) {
     m_serverSocket->close();
   }
-  QCoreApplication::exit();
 }
 
 
