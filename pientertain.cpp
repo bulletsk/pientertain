@@ -130,6 +130,7 @@ void PiEntertain::onNewColors( const QVector<QColor> &colorVector )
                                  static_cast<uint16_t>(mixedColor.y()*65535.0f),
                                  static_cast<uint16_t>(mixedColor.z()*65535.0f));
   }
+  sendCurrentPacket();
 }
 
 
