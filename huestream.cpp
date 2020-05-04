@@ -98,7 +98,7 @@ void HueStream::onDataAvailable()
 
 bool HueStream::isReadyToStream() const
 {
-  return (m_dtls == nullptr || !m_dtls->isConnectionEncrypted());
+  return (m_dtls != nullptr && m_dtls->isConnectionEncrypted());
 }
 
 
