@@ -102,4 +102,4 @@ use a PUT request with a JSON object contain any or all of the following key-val
 - RaspiCam 0.1.8 or higher, https://www.uco.es/investiga/grupos/ava/node/40
 
 ###### (*)
-Q5 5.12 introduces DTLS support for encrypted UDP packets. If you come here from the future, Qt 5.12 will be on your Pi preinstalled.
+Q5 5.12 introduces DTLS support for encrypted UDP packets. If you come here from the future, Qt 5.12 will be preinstalled on your Pi.
