@@ -10,7 +10,7 @@ in the camera image. An example Android app to control pientertain can be found 
 This project is for tinkering, proof-of-concept and learning. If you are looking for a complete solution to control your lights from different brands and types using various frame grabbers, check out Hyperion.ng here: https://github.com/hyperion-project/hyperion.ng.
 
 ### Installation
-Pientertain uses features of Qt 5.12 which doesnt come with raspbian yet unfortunately. To build my version of Qt 5.12 for the
+Pientertain uses features of Qt 5.12 which doesnt come with raspbian yet unfortunately (*). To build my version of Qt 5.12 for the
 Pi I used these guides:
 
 - https://www.raspberrypi.org/forums/viewtopic.php?t=204778
@@ -100,3 +100,6 @@ use a PUT request with a JSON object contain any or all of the following key-val
 - Raspberry Pi with camera module.
 - Qt 5.12 or higher, https://www.qt.io
 - RaspiCam 0.1.8 or higher, https://www.uco.es/investiga/grupos/ava/node/40
+
+## (*)
+Q5 5.12 introduces DTLS support for encrypted UDP packets. If you come here from the future, Qt 5.12 will be on your Pi preinstalled.
